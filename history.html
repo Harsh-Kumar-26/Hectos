@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contest History | HectoClash</title>
+  <!-- Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --dark-bg: #0d0d0d;
+      --blue-primary: #1e90ff;
+      --blue-accent: #00aaff;
+      --neon-blue: #00ccff;
+      --light-text: #e0e0e0;
+      --card-bg: rgba(20, 20, 20, 0.95);
+      --btn-bg: #1e90ff;
+      --btn-hover: #00aaff;
+      --border: #333;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    img{
+    width: 30vw;
+    height: 6vh;
+   }
+    body {
+      background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1a1a 100%);
+      color: var(--light-text);
+      min-height: 100vh;
+      padding-top: 60px; /* accommodate navbar height */
+    }
+    /* Navbar styling */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    nav .logo {
+      font-size: 1.8rem;
+      color: var(--blue-primary);
+      text-decoration: none;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+    nav ul li a {
+      color: var(--light-text);
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+    nav ul li a:hover, nav ul li a.active {
+      color: var(--blue-accent);
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      color: var(--blue-primary);
+    }
+    .container {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    table th, table td {
+      padding: 1rem;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    table th {
+      background: var(--blue-accent);
+    }
+    .no-history {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: var(--blue-primary);
+    }
+    /* Chart styling: place below table */
+    #chartContainer {
+      margin-top: 2rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav>
+    <a href="index.html" class="logo"><img src="Frame 545.png"></a>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="practice.html">Practice</a></li>
+      <li><a href="history.html" class="active">History</a></li>
+      <li><a href="logout.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <header>
+    <h1 style="margin-top: 3vh;">Contest History</h1>
+  </header>
+  <div class="container">
+    <!-- History Table -->
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Game ID</th>
+          <th>Final Score</th>
+          <th>Questions Attempted</th>
+          <th>Correct Answers</th>
+          <th>Skipped</th>
+          <th>Rating Change</th>
+          <th>New Rating</th>
+          <th>Outcome</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+        <!-- History rows will be injected here -->
+      </tbody>
+    </table>
+    <div class="no-history" id="noHistory" style="display:none;">
+      No contest history available.
+    </div>
+    <!-- Chart Container below the table -->
+    <div id="chartContainer">
+      <canvas id="historyChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
+      authDomain: "techsprint-53b5c.firebaseapp.com",
+      projectId: "techsprint-53b5c",
+      storageBucket: "techsprint-53b5c.appspot.com",
+      messagingSenderId: "366810852442",
+      appId: "1:366810852442:web:d31260159a6c8b1c307c63",
+      measurementId: "G-PTPH19Z3QG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const historyBody = document.getElementById("historyBody");
+    const noHistoryDiv = document.getElementById("noHistory");
+    const chartCanvas = document.getElementById("historyChart");
+
+    // Helper function to format Firestore timestamp to locale string
+    function formatTimestamp(timestamp) {
+      if (timestamp && timestamp.toDate) {
+        return timestamp.toDate().toLocaleString();
+      } else if (timestamp instanceof Date) {
+        return timestamp.toLocaleString();
+      }
+      return timestamp || "";
+    }
+
+    // Prepare data arrays for Chart.js
+    let chartLabels = [];
+    let chartData = [];
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Use the user's email as document ID
+        const userDocRef = doc(db, "users", user.email);
+        const userSnap = await getDoc(userDocRef);
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          const history = userData.history || [];
+          
+          if (history.length === 0) {
+            noHistoryDiv.style.display = "block";
+          } else {
+            // Sort history by timestamp
+            history.sort((a, b) => {
+              return new Date(a.timestamp.toDate ? a.timestamp.toDate() : a.timestamp) - new Date(b.timestamp.toDate ? b.timestamp.toDate() : b.timestamp);
+            });
+            history.forEach(game => {
+              const tr = document.createElement("tr");
+              const dateStr = formatTimestamp(game.timestamp);
+              tr.innerHTML = `
+                <td>${game.gameId || "-"}</td>
+                <td>${game.finalScore || 0}</td>
+                <td>${game.questionsAttempted || 0}</td>
+                <td>${game.correctAnswers || 0}</td>
+                <td>${game.skippedQuestions || 0}</td>
+                <td>${game.ratingChange >= 0 ? "+" + game.ratingChange : game.ratingChange}</td>
+                <td>${game.newRating || "-"}</td>
+                <td>${game.outcome || "-"}</td>
+                <td>${dateStr}</td>
+              `;
+              historyBody.appendChild(tr);
+              
+              // For chart: use date as label and final score as data
+              chartLabels.push(dateStr);
+              chartData.push(game.finalScore || 0);
+            });
+          }
+          // Build the chart after loading history
+          buildChart();
+        } else {
+          noHistoryDiv.style.display = "block";
+        }
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    function buildChart() {
+      // Create a line chart using Chart.js with dark theme settings
+      const ctx = chartCanvas.getContext("2d");
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            label: 'Final Score',
+            data: chartData,
+            borderColor: '#1e90ff',
+            backgroundColor: 'rgba(30,144,255,0.2)',
+            fill: true,
+            tension: 0.2,
+            pointRadius: 4,
+            pointBackgroundColor: '#00aaff'
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Date',
+                color: '#e0e0e0'
+              },
+              ticks: {
+                color: '#e0e0e0'
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.1)'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Final Score',
+                color: '#e0e0e0'
+              },
+              beginAtZero: true,
+              ticks: {
+                color: '#e0e0e0'
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.1)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: '#e0e0e0'
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
