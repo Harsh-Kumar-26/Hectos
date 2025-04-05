@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Game Results | HectoClash</title>
+  <style>
+    :root {
+      --dark-bg: #0d0d0d;
+      --blue-primary: #1e90ff;
+      --blue-accent: #00aaff;
+      --neon-blue: #00ccff;
+      --light-text: #e0e0e0;
+      --card-bg: rgba(20, 20, 20, 0.95);
+      --btn-bg: #1e90ff;
+      --btn-hover: #00aaff;
+      --border: #333;
+      --win-color: #4CAF50;
+      --lose-color: #F44336;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+      color: var(--light-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 204, 255, 0.15), transparent 70%);
+      animation: pulse 5s infinite;
+      z-index: -1;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    header {
+      width: 100%;
+      background: linear-gradient(90deg, var(--blue-primary), var(--blue-accent));
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    header h1 {
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    header h1:hover {
+      transform: scale(1.05);
+    }
+
+    main {
+      flex: 1;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .result-container {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .result-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border: 2px solid transparent;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .result-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+      border-color: var(--neon-blue);
+    }
+    .outcome {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .win { color: var(--win-color); }
+    .lose { color: var(--lose-color); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+    .stat-item {
+      background: rgba(0,0,0,0.2);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--neon-blue);
+    }
+    .rating-change {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin: 1rem 0;
+    }
+    .rating-change span { margin: 0 0.5rem; }
+    .positive { color: var(--win-color); }
+    .negative { color: var(--lose-color); }
+
+    .questions-list {
+      margin-top: 1.5rem;
+    }
+    .questions-list h3 {
+      margin-bottom: 1rem;
+      color: var(--blue-accent);
+    }
+    .question-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .btn {
+      padding: 12px 24px;
+      background: var(--btn-bg);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      background: var(--btn-hover);
+      transform: translateY(-2px);
+    }
+
+    footer {
+      background: #111;
+      padding: 2rem;
+      text-align: left;
+      width: 100%;
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+    footer h3 {
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      color: var(--blue-primary);
+    }
+    footer p { margin: 0.4rem 0; }
+
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .action-buttons { flex-direction: column; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="animated-bg"></div>
+  <header>
+    <h1 id="logo">HectoClash</h1>
+  </header>
+
+  <main>
+    <div class="result-container">
+      <div class="result-card">
+        <div class="result-header">
+          <h2>Game Results</h2>
+          <div class="outcome" id="outcome">Victory!</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">Final Score</div>
+            <div class="stat-value" id="finalScore">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Questions Attempted</div>
+            <div class="stat-value" id="questionsAttempted">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Correct Answers</div>
+            <div class="stat-value" id="correctAnswers">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Skipped Questions</div>
+            <div class="stat-value" id="skippedQuestions">0</div>
+          </div>
+        </div>
+
+        <div class="rating-change">
+          <span>Rating Change:</span>
+          <span id="ratingChange">+100</span>
+          <span>(New Rating: <span id="newRating">800</span>)</span>
+        </div>
+      </div>
+
+      <div class="result-card">
+       
+        
+
+        <div class="action-buttons">
+          <button class="btn" id="viewHistoryBtn">Check Contest History</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <h3>About HectoClash</h3>
+    <p>HectoClash is a real-time competitive mental math game inspired by the Hectoc format.</p>
+    <p><strong>Contact:</strong> hectoclash@hackfest.com</p>
+    <p>&copy; Hackfest. All rights reserved.</p>
+    <p><strong>Team:</strong> Harsh, Hirday, Tanish, Ayush</p>
+  </footer>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
+      authDomain: "techsprint-53b5c.firebaseapp.com",
+      projectId: "techsprint-53b5c",
+      storageBucket: "techsprint-53b5c.appspot.com",
+      messagingSenderId: "366810852442",
+      appId: "1:366810852442:web:d31260159a6c8b1c307c63",
+      measurementId: "G-PTPH19Z3QG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const logo = document.getElementById("logo");
+    const outcomeElement = document.getElementById("outcome");
+    const finalScoreElement = document.getElementById("finalScore");
+    const questionsAttemptedElement = document.getElementById("questionsAttempted");
+    const correctAnswersElement = document.getElementById("correctAnswers");
+    const skippedQuestionsElement = document.getElementById("skippedQuestions");
+    const ratingChangeElement = document.getElementById("ratingChange");
+    const newRatingElement = document.getElementById("newRating");
+    const skippedQuestionsListElement = document.getElementById("skippedQuestionsList");
+    const viewHistoryBtn = document.getElementById("viewHistoryBtn");
+
+    logo.addEventListener("click", () => {
+      window.location.href = "mainpage.html";
+    });
+
+    viewHistoryBtn.addEventListener("click", () => {
+      window.location.href = "history.html";
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const gameId = localStorage.getItem("gameId");
+        // Use the user's email as document ID (as set during signup)
+        const userDocRef = doc(db, "users", user.email);
+        
+        if (gameId) {
+          const gameRef = doc(db, "matchmaking", gameId);
+          const gameSnap = await getDoc(gameRef);
+
+          if (gameSnap.exists()) {
+            const gameData = gameSnap.data();
+            const isPlayer1 = gameData.player1 === user.uid;
+            const playerData = isPlayer1 ? gameData.p1 : gameData.p2;
+            const opponentData = isPlayer1 ? gameData.p2 : gameData.p1;
+
+            // Destructure game stats
+            const [score, correct, incorrect, skipped] = playerData;
+            finalScoreElement.textContent = score;
+            questionsAttemptedElement.textContent = correct + incorrect;
+            correctAnswersElement.textContent = correct;
+            skippedQuestionsElement.textContent = skipped;
+
+            // Determine win/loss outcome and calculate rating change
+            const userSnap = await getDoc(userDocRef);
+            const userData = userSnap.data();
+            let currentRating = userData.rating || 700;
+            let ratingChange = 0;
+            let outcomeText = "";
+            const isWinner = opponentData ? score > opponentData[0] : true;
+
+            if (isWinner) {
+              outcomeText = "Victory!";
+              outcomeElement.textContent = outcomeText;
+              outcomeElement.className = "outcome win";
+              ratingChange = 100;
+              ratingChangeElement.textContent = `+${ratingChange}`;
+              ratingChangeElement.className = "positive";
+            } else {
+              outcomeText = "Defeat";
+              outcomeElement.textContent = outcomeText;
+              outcomeElement.className = "outcome lose";
+              ratingChange = -50;
+              ratingChangeElement.textContent = ratingChange;
+              ratingChangeElement.className = "negative";
+            }
+
+            const newRating = currentRating + ratingChange;
+            newRatingElement.textContent = newRating;
+
+            // Update user's rating and highestRating
+            await updateDoc(userDocRef, {
+              rating: newRating,
+              highestRating: Math.max(newRating, userData.highestRating || 0)
+            });
+
+            // Prepare game history entry details
+            const gameEntry = {
+              gameId: gameId,
+              finalScore: score,
+              questionsAttempted: correct + incorrect,
+              correctAnswers: correct,
+              skippedQuestions: skipped,
+              ratingChange: ratingChange,
+              newRating: newRating,
+              outcome: outcomeText,
+              timestamp: new Date()
+            };
+
+            // Append the game record to the history array field
+            await updateDoc(userDocRef, {
+              history: arrayUnion(gameEntry)
+            });
+
+            // Display skipped questions (placeholder content)
+            for (let i = 0; i < Math.min(skipped, 5); i++) {
+              const questionItem = document.createElement("div");
+              questionItem.className = "question-item";
+              questionItem.textContent = `Question ${i + 1}: [Digits would appear here]`;
+              skippedQuestionsListElement.appendChild(questionItem);
+            }
+            if (skipped > 5) {
+              const remaining = document.createElement("div");
+              remaining.className = "question-item";
+              remaining.textContent = `+${skipped - 5} more skipped questions...`;
+              skippedQuestionsListElement.appendChild(remaining);
+            }
+          }
+        }
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+</body>
+</html>
