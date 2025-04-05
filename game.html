@@ -132,6 +132,7 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        let cor=0,incor=0,sk=0;
         uid = user.uid;
         const userRef = doc(db, "users", uid);
         const userSnap = await getDoc(userRef);
@@ -175,7 +176,6 @@ console.log(questionList);
 
         startGame();
       }
-    });
 
     function startGame() {
       showQuestion();
@@ -194,11 +194,14 @@ console.log(questionList);
         const expression = input.replace(/ /g, '');
         const result = eval(expression);
         if (Math.abs(result - 100) < 1e-6) {
+            cor++;
           score += 5;
         } else {
+            incor++;
           score -= 3;
         }
       } catch {
+        incor++;
         score -= 3;
       }
       scoreBox.innerText = score;
@@ -206,6 +209,7 @@ console.log(questionList);
     }
 
     async function skipQuestion() {
+        sk++;
       score -= 1;
       scoreBox.innerText = score;
       await nextQuestion();
@@ -233,19 +237,36 @@ console.log(questionList);
 
         if (--time < 0) {
           clearInterval(interval);
+          console.log("EndGame");
           await endGame();
         }
       }, 1000);
     }
 
     async function endGame() {
-      const gameRef = doc(db, "games", gameId);
-      await updateDoc(gameRef, {
-        [uid]: score
-      });
+        console.log("Times Up");
+      const gameRef = doc(db, "matchmaking", gameId);
+      const gameSnap = await getDoc(gameRef);
+        const gameData = await  gameSnap.data();
+        let id2;
+        const game=doc(db,"matchmaking",(gameId).toString());
+      if(gameData.player1 === uid){
+        updateDoc(game,{p1: [score,cor,incor,sk]});
+        id2=gameData.player2;
+      }
+      else{
+        id2=gameData.player1;
+        updateDoc(game,{p2: [score,cor,incor,sk]});
+      }
+      const player=doc(db,"users",uid);
+      const pld=await getDoc(player);
+      const num=await pld.data().num;
+      num++;
+      updateDoc(player,{num:num, game_id:gameId});
       alert("Time's up! Final Score: " + score);
       window.location.href = "result.html"; // Optional redirect
     }
+});
   </script>
 </body>
 </html>
