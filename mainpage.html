@@ -5,104 +5,175 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HectoClash - Main Page</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f7fe;
-      color: #111;
+    /* CSS Variables for easy customization */
+    :root {
+      --dark-bg: #0d0d0d;
+      --blue-primary: #1e90ff;
+      --blue-accent: #00aaff;
+      --neon-blue: #00ccff;
+      --light-text: #e0e0e0;
+      --card-bg: rgba(20, 20, 20, 0.95);
+      --btn-bg: #1e90ff;
+      --btn-hover: #00aaff;
     }
-
+    
+    /* Global resets and base styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+      color: var(--light-text);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Animated background overlay */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 204, 255, 0.15), transparent 70%);
+      animation: pulse 5s infinite;
+      z-index: -1;
+    }
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+    }
+    
+    /* Header styling */
     header {
-      background-color: #3b82f6;
+      width: 100%;
+      background: linear-gradient(90deg, var(--blue-primary), var(--blue-accent));
       padding: 1rem 2rem;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      color: white;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      position: relative;
     }
-
     header h1 {
-      margin: 0;
+      font-size: 2rem;
       cursor: pointer;
+      transition: transform 0.3s ease;
     }
-
+    header h1:hover {
+      transform: scale(1.05);
+    }
     nav {
       display: flex;
-      gap: 1.2rem;
       align-items: center;
+      gap: 1.5rem;
+      font-size: 1.1rem;
+      position: relative;
     }
-
+    nav span {
+      cursor: default;
+    }
     nav button {
-      background-color: transparent;
+      background: transparent;
       border: none;
-      color: white;
-      font-size: 1rem;
+      color: #fff;
       cursor: pointer;
+      transition: color 0.3s ease;
+      font-size: 1.3rem;
     }
-
-    .logout-btn {
-      color: #ff4d4d;
-      font-weight: bold;
+    nav button:hover {
+      color: var(--neon-blue);
     }
-
+    
+    /* Profile dropdown styling */
+    .profile-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 3.5rem;
+      background: var(--card-bg);
+      border: 1px solid #333;
+      border-radius: 8px;
+      min-width: 150px;
+      z-index: 10;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+    .profile-dropdown a,
+    .profile-dropdown button {
+      display: block;
+      padding: 0.8rem 1rem;
+      color: var(--light-text);
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .profile-dropdown a:hover,
+    .profile-dropdown button:hover {
+      background: rgba(0,0,0,0.3);
+    }
+    
+    /* Main content area */
     main {
+      flex: 1;
       padding: 3rem 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2rem;
     }
-
     main h2 {
-      font-size: 2rem;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--blue-accent);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
-
     .buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
       width: 90%;
-      max-width: 400px;
+      max-width: 800px;
     }
-
-    .buttons button {
-      padding: 1rem;
-      font-size: 1rem;
-      background-color: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 10px;
+    
+    /* Card styles for each game mode option */
+    .card {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border: 2px solid transparent;
     }
-
-    .buttons button:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+      border-color: var(--neon-blue);
     }
-
-    .input-box {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      justify-content: center;
+    .card h3 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: var(--blue-primary);
     }
-
-    .input-box input {
-      padding: 0.8rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+    .card p {
       font-size: 1rem;
-      flex: 1;
+      color: var(--light-text);
     }
-
-    #gameIdDisplay {
-      font-weight: bold;
-      color: #3b82f6;
-      margin-top: -10px;
-    }
-
+    
+    /* Loader styling */
     #loader {
       display: none;
       position: fixed;
@@ -110,50 +181,85 @@
       left: 0;
       height: 100vh;
       width: 100vw;
-      background: #000000aa;
-      color: white;
-      font-size: 1.8rem;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 2rem;
       z-index: 1000;
       justify-content: center;
       align-items: center;
     }
-
+    
+    /* Footer styling */
     footer {
-      margin-top: 5rem;
-      background-color: #111;
-      color: white;
+      background: #111;
       padding: 2rem;
       text-align: left;
+      width: 100%;
+      color: #ccc;
+      font-size: 0.9rem;
     }
-
     footer h3 {
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      color: var(--blue-primary);
+    }
+    footer p {
+      margin: 0.4rem 0;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+      }
+      main h2 {
+        font-size: 2rem;
+        text-align: center;
+      }
+      .buttons {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-
+  <div class="animated-bg"></div>
   <header>
     <h1 id="logo">HectoClash</h1>
     <nav>
-      <span id="welcome">Welcome User</span>
+      <!-- Welcome text gets updated with user's name -->
+      <span id="welcome">Welcome</span>
+      <!-- Profile button that toggles the dropdown -->
       <button id="profileBtn">👤</button>
-      <button class="logout-btn" id="logout">Logout</button>
+      <!-- Dropdown container -->
+      <div class="profile-dropdown" id="profileDropdown">
+        <a href="profile.html">View Profile</a>
+        <button id="dropdownLogout">Logout</button>
+      </div>
     </nav>
   </header>
 
   <main>
-    <h2>Choose a Game Mode</h2>
+    <h2>Choose Your Challenge</h2>
     <div class="buttons">
-      <button id="onevone">1v1 Online (Random)</button>
-      <button id="createGame">Create Game ID (Invite)</button>
-      <div id="gameIdDisplay"></div>
-      <div class="input-box">
-        <input type="text" id="joinInput" placeholder="Enter Game ID to join">
-        <button id="joinGame">Join</button>
+      <div id="onevone" class="card">
+        <h3>1v1 Online</h3>
+        <p>Join a random match and test your skills!</p>
       </div>
-      <button id="leaderboard">Leaderboard</button>
-      <button id="help">Help</button>
+      <div id="leaderboard" class="card">
+        <h3>Leaderboard</h3>
+        <p>See the top players and challenge your rank.</p>
+      </div>
+      <div id="help" class="card">
+        <h3>Help & Info</h3>
+        <p>Learn more about HectoClash and how to play.</p>
+      </div>
     </div>
   </main>
 
@@ -161,14 +267,13 @@
 
   <footer>
     <h3>About HectoClash</h3>
-    <p>HectoClash is a real-time competitive mental math game based on the Hectoc format. Challenge your friends or compete with random opponents to hit 100 using just six digits!</p>
-    <br />
+    <p>HectoClash is a real-time competitive mental math game inspired by the Hectoc format. Challenge your friends or take on random opponents in a race to 100 using only six digits.</p>
     <p><strong>Contact:</strong> hectoclash@hackfest.com</p>
-    <p>@Hackfest All rights reserved</p>
+    <p>&copy; Hackfest. All rights reserved.</p>
     <p><strong>Team:</strong> Harsh, Hirday, Tanish, Ayush</p>
   </footer>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK and functionality -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
@@ -189,27 +294,41 @@
     const db = getFirestore(app);
 
     const welcome = document.getElementById("welcome");
-    const logout = document.getElementById("logout");
-    const logo = document.getElementById("logo");
+    const profileBtn = document.getElementById("profileBtn");
+    const profileDropdown = document.getElementById("profileDropdown");
+    const dropdownLogout = document.getElementById("dropdownLogout");
     const onevoneBtn = document.getElementById("onevone");
-    const createGameBtn = document.getElementById("createGame");
-    const joinGameBtn = document.getElementById("joinGame");
-    const joinInput = document.getElementById("joinInput");
+    const leaderboardBtn = document.getElementById("leaderboard");
+    const helpBtn = document.getElementById("help");
     const loader = document.getElementById("loader");
-    const gameIdDisplay = document.getElementById("gameIdDisplay");
+    const logo = document.getElementById("logo");
 
+    // Toggle dropdown on profile button click
+    profileBtn.addEventListener("click", () => {
+      profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
+    });
+
+    // Logout action from dropdown
+    dropdownLogout.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.style.display = "none";
+      }
+    });
+
+    // Check authentication state; if not logged in, redirect to login.html
     onAuthStateChanged(auth, (user) => {
       if (user) {
         welcome.innerText = `Welcome ${user.displayName || "Player"}`;
       } else {
-        window.location.href = "index.html";
+        window.location.href = "login.html";
       }
-    });
-
-    logout.addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "index.html";
-      });
     });
 
     logo.addEventListener("click", () => {
@@ -222,43 +341,37 @@
       loader.style.display = "flex";
       const user = auth.currentUser;
       const matchRef = collection(db, "matchmaking");
-
       const q = query(matchRef, where("status", "==", "waiting"));
       const snap = await getDocs(q);
 
       if (!snap.empty) {
-        const room = await snap.docs[0];
+        const room = snap.docs[0];
         await updateDoc(doc(db, "matchmaking", room.id), {
           player2: user.uid,
           status: "full"
         });
-        console.log(room.id);
         localStorage.setItem("gameId", room.id);
         window.location.href = "game.html";
       } else {
         const gameId = generateGameID();
-        function generateRandomArray() {
-            const result = {};
-            for (let i = 0; i < 180; i++) {
-                const row = [];
-                for (let j = 0; j < 6; j++) {
-                    row.push(Math.floor(Math.random() * 9) + 1); // random int from 1 to 9
-                }
-                result[`q${i+1}`]=row;
+        const generateRandomArray = () => {
+          const result = {};
+          for (let i = 0; i < 180; i++) {
+            const row = [];
+            for (let j = 0; j < 6; j++) {
+              row.push(Math.floor(Math.random() * 9) + 1);
             }
-            return result;
-        }
-        const random=generateRandomArray();
-        console.log(random);
-const questions = generateRandomArray();
-console.log(questions);
+            result[`q${i+1}`] = row;
+          }
+          return result;
+        };
+        const questions = generateRandomArray();
         await setDoc(doc(db, "matchmaking", gameId), {
           player1: user.uid,
           status: "waiting",
           createdAt: serverTimestamp(),
-          questions:random
+          questions
         });
-
         const unsubscribe = onSnapshot(doc(db, "matchmaking", gameId), (docSnap) => {
           if (docSnap.exists() && docSnap.data().status === "full") {
             unsubscribe();
@@ -269,47 +382,12 @@ console.log(questions);
       }
     });
 
-    createGameBtn.addEventListener("click", async () => {
-      const user = auth.currentUser;
-      const gameId = generateGameID();
-      gameIdDisplay.innerText = `Game ID: ${gameId}`;
-
-      await setDoc(doc(db, "matchmaking", gameId), {
-        player1: user.uid,
-        status: "waiting",
-        createdAt: serverTimestamp()
-      });
-
-      loader.style.display = "flex";
-
-      const unsub = onSnapshot(doc(db, "matchmaking", gameId), (docSnap) => {
-        if (docSnap.exists() && docSnap.data().status === "full") {
-          unsub();
-          localStorage.setItem("gameId", gameId);
-          window.location.href = "game.html";
-        }
-      });
+    leaderboardBtn.addEventListener("click", () => {
+      window.location.href = "leaderboard.html";
     });
 
-    joinGameBtn.addEventListener("click", async () => {
-      const user = auth.currentUser;
-      const gameId = joinInput.value.trim();
-      if (!gameId) return alert("Please enter a valid Game ID");
-
-      const docRef = doc(db, "matchmaking", gameId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists() && docSnap.data().status === "waiting") {
-        await updateDoc(docRef, {
-          player2: user.uid,
-          status: "full"
-        });
-
-        localStorage.setItem("gameId", gameId);
-        window.location.href = "game.html";
-      } else {
-        alert("Game ID not valid or already full.");
-      }
+    helpBtn.addEventListener("click", () => {
+      window.location.href = "help.html";
     });
   </script>
 </body>

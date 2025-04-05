@@ -132,7 +132,7 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        let cor=0,incor=0,sk=0;
+        let cor=0;let incor=0;let sk=0;
         uid = user.uid;
         const userRef = doc(db, "users", uid);
         const userSnap = await getDoc(userRef);
