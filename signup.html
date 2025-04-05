@@ -4,95 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Signup | HectoClash</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    /* CSS Variables matching index.html */
     :root {
-      --bg-color: #eaf2fb;
-      --card-color: #ffffff;
-      --primary: #2980b9;
-      --primary-dark: #21618c;
-      --text: #2c3e50;
-      --input-bg: #f1f6fc;
+      --dark-bg: #0d0d0d;
+      --blue-primary: #1e90ff;
+      --blue-accent: #00aaff;
+      --neon-blue: #00ccff;
+      --light-text: #e0e0e0;
+      --card-bg: rgba(20, 20, 20, 0.95);
+      --btn-bg: #1e90ff;
+      --btn-hover: #00aaff;
+      --input-bg: rgba(30, 30, 30, 0.8);
+      --border: #333;
     }
 
+    /* Global resets matching index.html */
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: var(--bg-color);
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+      color: var(--light-text);
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 1rem;
     }
 
+    /* Animated background matching index.html */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 204, 255, 0.15), transparent 70%);
+      animation: pulse 5s infinite;
+      z-index: -1;
+    }
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+    }
+
+    /* Card styling matching index.html */
     .card {
-      background-color: var(--card-color);
-      padding: 2rem 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
       max-width: 400px;
       width: 100%;
+      border: 1px solid var(--border);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .card h2 {
-      color: var(--primary);
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      text-align: center;
-    }
-
-    .input-group {
-      margin-bottom: 1rem;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 0.4rem;
-      color: var(--text);
-      font-size: 0.9rem;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: 8px;
-      border: 1px solid #dce6f2;
-      background-color: var(--input-bg);
-      font-size: 1rem;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 12px;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .btn:hover {
-      background-color: var(--primary-dark);
-    }
-
-    .back {
-      margin-top: 1rem;
-      text-align: center;
-      font-size: 0.9rem;
-    }
-
-    .back a {
-      color: var(--primary-dark);
-      text-decoration: none;
-      font-weight: 600;
-    }
+    .card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 25px var(--blue-accent), 0 0 40px var(--neon-blue);
+}
 
     .logo {
       display: flex;
@@ -100,20 +80,104 @@
       justify-content: center;
       font-size: 1.8rem;
       font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 1rem;
+      color: var(--blue-primary);
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .card h2 {
+      color: var(--blue-accent);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--light-text);
+      font-size: 0.95rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--light-text);
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 8px rgba(0, 170, 255, 0.4);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--btn-bg);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    .btn:hover {
+      background: var(--btn-hover);
+      transform: translateY(-2px);
+    }
+
+    .back {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--light-text);
+    }
+
+    .back a {
+      color: var(--blue-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .back a:hover {
+      color: var(--neon-blue);
+      text-decoration: underline;
     }
 
     @media screen and (max-width: 480px) {
       .card {
         padding: 1.5rem;
       }
+      
+      .card h2 {
+        font-size: 1.5rem;
+      }
+      
+      .logo {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="animated-bg"></div>
+  
   <div class="card">
-    <div class="logo">🔥 HectoClash</div>
+    <div class="logo">HectoClash</div>
     <h2>Create Your Account</h2>
     <div class="input-group">
       <label for="name">Full Name</label>
@@ -176,12 +240,12 @@
           city: city,
           email: email,
           createdAt: new Date(),
-          rating:700,
-          num:0
+          rating: 700,
+          num: 0
         });
 
         alert("Signup successful! Redirecting...");
-        window.location.href = "mainpage.html";
+        window.location.href = "mainpage.html";  // Changed to index.html to match your main page
       } catch (error) {
         alert("Signup failed: " + error.message);
       }
