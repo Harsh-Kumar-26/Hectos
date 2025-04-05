@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HectoClash Game</title>
-  <link rel="stylesheet" href="style.css" />
-  <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js"></script>
+  <!-- <link rel="stylesheet" href="style.css" /> -->
+  <!-- <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js"></script> -->
+  <!-- <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js"></script> -->
+  <!-- <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js"></script> -->
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -96,15 +96,15 @@
 
     <div class="input-area">
       <input type="text" id="answerInput" placeholder="Enter your expression" />
-      <button onclick="submitAnswer()">Submit</button>
-      <button onclick="skipQuestion()">Skip</button>
+      <button id="submit">Submit</button>
+      <button id="skip">Skip</button>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
     import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
@@ -122,53 +122,73 @@
 
     let uid = null;
     let score = 0;
-    let currentQuestion = '';
-    let questionList = [];
     let questionIndex = 0;
-    let gameId = sessionStorage.getItem("gameId");
+    let gameId = localStorage.getItem("gameId");
 
     const questionBox = document.getElementById("question");
     const scoreBox = document.getElementById("score");
+
+    let questionList = [];
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         uid = user.uid;
         const userRef = doc(db, "users", uid);
         const userSnap = await getDoc(userRef);
-        const data = userSnap.data();
+        const data = await userSnap.data();
 
-        document.getElementById("p1name").innerText = data.name;
-        document.getElementById("p1pic").src = data.profile || "default.png";
+        document.getElementById("p1name").innerText = await data.name;
+        document.getElementById("p1pic").src = await data.profile || "default.png";
+        console.log(gameId);
+        const gameRef = doc(db, "matchmaking", gameId);
+        const gameSnap = await getDoc(gameRef);
+        const gameData = await  gameSnap.data();
+        console.log(gameData);
+        if (gameData.player1 === uid) {
+            const id2=gameData.player2;
+            console.log(id2);
+            const userRef2 = doc(db, "users", id2);
+            const userSnap2 = await getDoc(userRef2);
+            const data2 = userSnap2.data();
+            document.getElementById("p2name").innerText = data2.name;
+            document.getElementById("p2pic").src = data2.profile || "default.png";
+        } else {
+            const id1=gameData.player1;
+            console.log(id1);
+            const userRef2 = doc(db, "users", id1);
+            const userSnap2 = await getDoc(userRef2);
+            const data2 = userSnap2.data();
+            document.getElementById("p2name").innerText = data2.name;
+            document.getElementById("p2pic").src = data2.profile || "default.png";
+        }
+        const questionsObj=await gameData.questions;
+        const questions2d=[];
+        // Fetch all 180 questions from the object format (doc per question)
+        for (let i = 1; i <= 180; i++) {
+        const key = "q" + i;
+        if (questionsObj[key]) {
+        questions2d.push(questionsObj[key]);
+  }
+}
+questionList=questions2d;
+console.log(questionList);
 
-        const gameRef = doc(db, "games", gameId);
-
-        onSnapshot(gameRef, (snap) => {
-          const gameData = snap.data();
-          questionList = gameData.questions;
-
-          if (gameData.p1 === uid) {
-            document.getElementById("p2name").innerText = gameData.p2Name;
-            document.getElementById("p2pic").src = gameData.p2Pic || "default.png";
-          } else {
-            document.getElementById("p2name").innerText = gameData.p1Name;
-            document.getElementById("p2pic").src = gameData.p1Pic || "default.png";
-          }
-
-          startGame();
-        });
-      } else {
-        window.location.href = "index.html";
+        startGame();
       }
     });
 
     function startGame() {
-      if (!questionList.length) return;
-      currentQuestion = questionList[questionIndex];
-      questionBox.innerText = currentQuestion;
+      showQuestion();
       startTimer(180);
     }
 
-    function submitAnswer() {
+    function showQuestion() {
+      const currentDigits = questionList[questionIndex];
+      questionBox.innerText = currentDigits.join(" ");
+    }
+    document.getElementById("submit").addEventListener("click",submitAnswer);
+    document.getElementById("skip").addEventListener("click",skipQuestion);
+    async function submitAnswer() {
       const input = document.getElementById("answerInput").value;
       try {
         const expression = input.replace(/ /g, '');
@@ -182,29 +202,29 @@
         score -= 3;
       }
       scoreBox.innerText = score;
-      document.getElementById("answerInput").value = "";
-      nextQuestion();
+      await nextQuestion();
     }
 
-    function skipQuestion() {
+    async function skipQuestion() {
       score -= 1;
       scoreBox.innerText = score;
-      nextQuestion();
+      await nextQuestion();
     }
 
-    function nextQuestion() {
+    async function nextQuestion() {
+      document.getElementById("answerInput").value = "";
       questionIndex++;
       if (questionIndex >= questionList.length) {
-        questionIndex = 0;
+        await endGame();
+      } else {
+        showQuestion();
       }
-      currentQuestion = questionList[questionIndex];
-      questionBox.innerText = currentQuestion;
     }
 
     function startTimer(duration) {
       let time = duration;
       const timerDisplay = document.getElementById("timer");
-      const interval = setInterval(() => {
+      const interval = setInterval(async () => {
         let minutes = Math.floor(time / 60);
         let seconds = time % 60;
         timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds
@@ -213,14 +233,18 @@
 
         if (--time < 0) {
           clearInterval(interval);
-          const gameRef = doc(db, "games", gameId);
-          updateDoc(gameRef, {
-            [uid]: score,
-            status: "finished"
-          });
-          alert("Time's up! Final Score: " + score);
+          await endGame();
         }
       }, 1000);
+    }
+
+    async function endGame() {
+      const gameRef = doc(db, "games", gameId);
+      await updateDoc(gameRef, {
+        [uid]: score
+      });
+      alert("Time's up! Final Score: " + score);
+      window.location.href = "result.html"; // Optional redirect
     }
   </script>
 </body>

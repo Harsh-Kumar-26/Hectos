@@ -227,19 +227,36 @@
       const snap = await getDocs(q);
 
       if (!snap.empty) {
-        const room = snap.docs[0];
+        const room = await snap.docs[0];
         await updateDoc(doc(db, "matchmaking", room.id), {
           player2: user.uid,
           status: "full"
         });
+        console.log(room.id);
         localStorage.setItem("gameId", room.id);
         window.location.href = "game.html";
       } else {
         const gameId = generateGameID();
+        function generateRandomArray() {
+            const result = {};
+            for (let i = 0; i < 180; i++) {
+                const row = [];
+                for (let j = 0; j < 6; j++) {
+                    row.push(Math.floor(Math.random() * 9) + 1); // random int from 1 to 9
+                }
+                result[`q${i+1}`]=row;
+            }
+            return result;
+        }
+        const random=generateRandomArray();
+        console.log(random);
+const questions = generateRandomArray();
+console.log(questions);
         await setDoc(doc(db, "matchmaking", gameId), {
           player1: user.uid,
           status: "waiting",
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
+          questions:random
         });
 
         const unsubscribe = onSnapshot(doc(db, "matchmaking", gameId), (docSnap) => {
