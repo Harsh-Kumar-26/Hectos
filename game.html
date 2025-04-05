@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HectoClash Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eaf4ff;
+      margin: 0;
+      padding: 0;
+      color: #003366;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    .player {
+      display: flex;
+      align-items: center;
+    }
+    .player img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .score {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .question {
+      font-size: 2rem;
+      margin: 2rem 0;
+    }
+    .input-area {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      width: 60%;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #005fa3;
+      transform: translateY(-2px);
+    }
+    .timer {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="player" id="player1">
+        <img src="" id="p1pic" alt="Player 1" />
+        <span id="p1name">Player 1</span>
+      </div>
+      <div class="timer" id="timer">03:00</div>
+      <div class="player" id="player2">
+        <span id="p2name">Player 2</span>
+        <img src="" id="p2pic" alt="Player 2" />
+      </div>
+    </div>
+
+    <div class="score">Score: <span id="score">0</span></div>
+
+    <div class="question" id="question">Loading...</div>
+
+    <div class="input-area">
+      <input type="text" id="answerInput" placeholder="Enter your expression" />
+      <button onclick="submitAnswer()">Submit</button>
+      <button onclick="skipQuestion()">Skip</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
+      authDomain: "techsprint-53b5c.firebaseapp.com",
+      projectId: "techsprint-53b5c",
+      storageBucket: "techsprint-53b5c.appspot.com",
+      messagingSenderId: "366810852442",
+      appId: "1:366810852442:web:d31260159a6c8b1c307c63",
+      measurementId: "G-PTPH19Z3QG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let uid = null;
+    let score = 0;
+    let currentQuestion = '';
+    let questionList = [];
+    let questionIndex = 0;
+    let gameId = sessionStorage.getItem("gameId");
+
+    const questionBox = document.getElementById("question");
+    const scoreBox = document.getElementById("score");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        uid = user.uid;
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        const data = userSnap.data();
+
+        document.getElementById("p1name").innerText = data.name;
+        document.getElementById("p1pic").src = data.profile || "default.png";
+
+        const gameRef = doc(db, "games", gameId);
+
+        onSnapshot(gameRef, (snap) => {
+          const gameData = snap.data();
+          questionList = gameData.questions;
+
+          if (gameData.p1 === uid) {
+            document.getElementById("p2name").innerText = gameData.p2Name;
+            document.getElementById("p2pic").src = gameData.p2Pic || "default.png";
+          } else {
+            document.getElementById("p2name").innerText = gameData.p1Name;
+            document.getElementById("p2pic").src = gameData.p1Pic || "default.png";
+          }
+
+          startGame();
+        });
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    function startGame() {
+      if (!questionList.length) return;
+      currentQuestion = questionList[questionIndex];
+      questionBox.innerText = currentQuestion;
+      startTimer(180);
+    }
+
+    function submitAnswer() {
+      const input = document.getElementById("answerInput").value;
+      try {
+        const expression = input.replace(/ /g, '');
+        const result = eval(expression);
+        if (Math.abs(result - 100) < 1e-6) {
+          score += 5;
+        } else {
+          score -= 3;
+        }
+      } catch {
+        score -= 3;
+      }
+      scoreBox.innerText = score;
+      document.getElementById("answerInput").value = "";
+      nextQuestion();
+    }
+
+    function skipQuestion() {
+      score -= 1;
+      scoreBox.innerText = score;
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      questionIndex++;
+      if (questionIndex >= questionList.length) {
+        questionIndex = 0;
+      }
+      currentQuestion = questionList[questionIndex];
+      questionBox.innerText = currentQuestion;
+    }
+
+    function startTimer(duration) {
+      let time = duration;
+      const timerDisplay = document.getElementById("timer");
+      const interval = setInterval(() => {
+        let minutes = Math.floor(time / 60);
+        let seconds = time % 60;
+        timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds
+          .toString()
+          .padStart(2, '0')}`;
+
+        if (--time < 0) {
+          clearInterval(interval);
+          const gameRef = doc(db, "games", gameId);
+          updateDoc(gameRef, {
+            [uid]: score,
+            status: "finished"
+          });
+          alert("Time's up! Final Score: " + score);
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

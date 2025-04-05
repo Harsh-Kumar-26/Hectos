@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HectoClash - Main Page</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7fe;
+      color: #111;
+    }
+
+    header {
+      background-color: #3b82f6;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+    }
+
+    header h1 {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    nav {
+      display: flex;
+      gap: 1.2rem;
+      align-items: center;
+    }
+
+    nav button {
+      background-color: transparent;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .logout-btn {
+      color: #ff4d4d;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    main h2 {
+      font-size: 2rem;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .buttons button {
+      padding: 1rem;
+      font-size: 1rem;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .buttons button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    }
+
+    .input-box {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .input-box input {
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      flex: 1;
+    }
+
+    #gameIdDisplay {
+      font-weight: bold;
+      color: #3b82f6;
+      margin-top: -10px;
+    }
+
+    #loader {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background: #000000aa;
+      color: white;
+      font-size: 1.8rem;
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    footer {
+      margin-top: 5rem;
+      background-color: #111;
+      color: white;
+      padding: 2rem;
+      text-align: left;
+    }
+
+    footer h3 {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 id="logo">HectoClash</h1>
+    <nav>
+      <span id="welcome">Welcome User</span>
+      <button id="profileBtn">👤</button>
+      <button class="logout-btn" id="logout">Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Choose a Game Mode</h2>
+    <div class="buttons">
+      <button id="onevone">1v1 Online (Random)</button>
+      <button id="createGame">Create Game ID (Invite)</button>
+      <div id="gameIdDisplay"></div>
+      <div class="input-box">
+        <input type="text" id="joinInput" placeholder="Enter Game ID to join">
+        <button id="joinGame">Join</button>
+      </div>
+      <button id="leaderboard">Leaderboard</button>
+      <button id="help">Help</button>
+    </div>
+  </main>
+
+  <div id="loader">Waiting for opponent to join...</div>
+
+  <footer>
+    <h3>About HectoClash</h3>
+    <p>HectoClash is a real-time competitive mental math game based on the Hectoc format. Challenge your friends or compete with random opponents to hit 100 using just six digits!</p>
+    <br />
+    <p><strong>Contact:</strong> hectoclash@hackfest.com</p>
+    <p>@Hackfest All rights reserved</p>
+    <p><strong>Team:</strong> Harsh, Hirday, Tanish, Ayush</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
+      authDomain: "techsprint-53b5c.firebaseapp.com",
+      projectId: "techsprint-53b5c",
+      storageBucket: "techsprint-53b5c.appspot.com",
+      messagingSenderId: "366810852442",
+      appId: "1:366810852442:web:d31260159a6c8b1c307c63",
+      measurementId: "G-PTPH19Z3QG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const welcome = document.getElementById("welcome");
+    const logout = document.getElementById("logout");
+    const logo = document.getElementById("logo");
+    const onevoneBtn = document.getElementById("onevone");
+    const createGameBtn = document.getElementById("createGame");
+    const joinGameBtn = document.getElementById("joinGame");
+    const joinInput = document.getElementById("joinInput");
+    const loader = document.getElementById("loader");
+    const gameIdDisplay = document.getElementById("gameIdDisplay");
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        welcome.innerText = `Welcome ${user.displayName || "Player"}`;
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    logout.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      });
+    });
+
+    logo.addEventListener("click", () => {
+      window.location.reload();
+    });
+
+    const generateGameID = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+    onevoneBtn.addEventListener("click", async () => {
+      loader.style.display = "flex";
+      const user = auth.currentUser;
+      const matchRef = collection(db, "matchmaking");
+
+      const q = query(matchRef, where("status", "==", "waiting"));
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        const room = snap.docs[0];
+        await updateDoc(doc(db, "matchmaking", room.id), {
+          player2: user.uid,
+          status: "full"
+        });
+        localStorage.setItem("gameId", room.id);
+        window.location.href = "game.html";
+      } else {
+        const gameId = generateGameID();
+        await setDoc(doc(db, "matchmaking", gameId), {
+          player1: user.uid,
+          status: "waiting",
+          createdAt: serverTimestamp()
+        });
+
+        const unsubscribe = onSnapshot(doc(db, "matchmaking", gameId), (docSnap) => {
+          if (docSnap.exists() && docSnap.data().status === "full") {
+            unsubscribe();
+            localStorage.setItem("gameId", gameId);
+            window.location.href = "game.html";
+          }
+        });
+      }
+    });
+
+    createGameBtn.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      const gameId = generateGameID();
+      gameIdDisplay.innerText = `Game ID: ${gameId}`;
+
+      await setDoc(doc(db, "matchmaking", gameId), {
+        player1: user.uid,
+        status: "waiting",
+        createdAt: serverTimestamp()
+      });
+
+      loader.style.display = "flex";
+
+      const unsub = onSnapshot(doc(db, "matchmaking", gameId), (docSnap) => {
+        if (docSnap.exists() && docSnap.data().status === "full") {
+          unsub();
+          localStorage.setItem("gameId", gameId);
+          window.location.href = "game.html";
+        }
+      });
+    });
+
+    joinGameBtn.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      const gameId = joinInput.value.trim();
+      if (!gameId) return alert("Please enter a valid Game ID");
+
+      const docRef = doc(db, "matchmaking", gameId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists() && docSnap.data().status === "waiting") {
+        await updateDoc(docRef, {
+          player2: user.uid,
+          status: "full"
+        });
+
+        localStorage.setItem("gameId", gameId);
+        window.location.href = "game.html";
+      } else {
+        alert("Game ID not valid or already full.");
+      }
+    });
+  </script>
+</body>
+</html>

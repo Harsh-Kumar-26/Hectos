@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | HectoClash</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #eaf2fb;
+      --card-color: #ffffff;
+      --primary: #2980b9;
+      --primary-dark: #21618c;
+      --text: #2c3e50;
+      --input-bg: #f1f6fc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .card {
+      background-color: var(--card-color);
+      padding: 2rem 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .card h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #dce6f2;
+      background-color: var(--input-bg);
+      font-size: 1rem;
+      transition: border 0.3s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .back {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .back a {
+      color: var(--primary-dark);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    @media screen and (max-width: 480px) {
+      .card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🔥 HectoClash</div>
+    <h2>Welcome Back</h2>
+    <div class="input-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email" />
+    </div>
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" />
+    </div>
+    <button class="btn" onclick="login()">Login</button>
+    <div class="back">New here? <a href="signup.html">Create account</a></div>
+  </div>
+
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
+      authDomain: "techsprint-53b5c.firebaseapp.com",
+      projectId: "techsprint-53b5c",
+      storageBucket: "techsprint-53b5c.appspot.com",
+      messagingSenderId: "366810852442",
+      appId: "1:366810852442:web:d31260159a6c8b1c307c63",
+      measurementId: "G-PTPH19Z3QG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.login = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Login successful! Redirecting...");
+          window.location.href = "mainpage.html"; // replace with your dashboard or game page
+        })
+        .catch((error) => {
+          alert("Login failed: " + error.message);
+        });
+    };
+  </script>
+</body>
+</html>
