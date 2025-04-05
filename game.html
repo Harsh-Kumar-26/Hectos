@@ -2,49 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HectoClash Game</title>
-  <!-- <link rel="stylesheet" href="style.css" /> -->
-  <!-- <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js"></script> -->
-  <!-- <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js"></script> -->
-  <!-- <script type="module" src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js"></script> -->
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #eaf4ff;
+    /* CSS Variables matching your theme */
+    :root {
+      --dark-bg: #0d0d0d;
+      --blue-primary: #1e90ff;
+      --blue-accent: #00aaff;
+      --neon-blue: #00ccff;
+      --light-text: #e0e0e0;
+      --card-bg: rgba(20, 20, 20, 0.95);
+      --btn-bg: #1e90ff;
+      --btn-hover: #00aaff;
+      --border: #333;
+    }
+    /* Global styles */
+    * {
       margin: 0;
       padding: 0;
-      color: #003366;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+      color: var(--light-text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /* Animated background */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 204, 255, 0.15), transparent 70%);
+      animation: pulse 5s infinite;
+      z-index: -1;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
     }
     .container {
       max-width: 900px;
-      margin: auto;
+      width: 100%;
       padding: 2rem;
-      text-align: center;
+      background: var(--card-bg);
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      margin: 1rem;
     }
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 0;
+      margin-bottom: 1.5rem;
     }
     .player {
       display: flex;
       align-items: center;
+      gap: 10px;
     }
     .player img {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      margin-right: 10px;
+      object-fit: cover;
+      border: 2px solid var(--blue-primary);
+    }
+    .timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--neon-blue);
+      min-width: 80px;
+      text-align: center;
     }
     .score {
       font-size: 1.2rem;
       font-weight: bold;
+      color: var(--blue-accent);
+      margin: 1rem 0;
+      text-align: center;
     }
     .question {
       font-size: 2rem;
       margin: 2rem 0;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      color: var(--neon-blue);
+      letter-spacing: 2px;
     }
     .input-area {
       display: flex;
@@ -53,30 +106,46 @@
       margin-bottom: 1rem;
     }
     input[type="text"] {
-      padding: 10px;
+      padding: 12px 16px;
       font-size: 1rem;
       width: 60%;
+      background: rgba(30,30,30,0.8);
+      border: 1px solid var(--border);
+      color: var(--light-text);
+      border-radius: 8px;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 8px rgba(0, 170, 255, 0.4);
     }
     button {
-      padding: 10px 15px;
+      padding: 12px 20px;
       font-size: 1rem;
       cursor: pointer;
-      background-color: #0077cc;
+      background: var(--btn-bg);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
     }
     button:hover {
-      background-color: #005fa3;
+      background: var(--btn-hover);
       transform: translateY(-2px);
     }
-    .timer {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container { padding: 1rem; }
+      .header { flex-direction: column; gap: 1rem; }
+      .question { font-size: 1.5rem; }
+      .input-area { flex-direction: column; align-items: center; }
+      input[type="text"] { width: 100%; }
     }
   </style>
 </head>
 <body>
+  <div class="animated-bg"></div>
   <div class="container">
     <div class="header">
       <div class="player" id="player1">
@@ -87,13 +156,12 @@
       <div class="player" id="player2">
         <span id="p2name">Player 2</span>
         <img src="" id="p2pic" alt="Player 2" />
+        <!-- New element for real-time opponent score -->
+        <div class="score" id="opponentScore">Score: 0</div>
       </div>
     </div>
-
     <div class="score">Score: <span id="score">0</span></div>
-
     <div class="question" id="question">Loading...</div>
-
     <div class="input-area">
       <input type="text" id="answerInput" placeholder="Enter your expression" />
       <button id="submit">Submit</button>
@@ -104,7 +172,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
     import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
@@ -124,58 +192,79 @@
     let score = 0;
     let questionIndex = 0;
     let gameId = localStorage.getItem("gameId");
+    let cor = 0, incor = 0, sk = 0;
+    let timerInterval;
+    let questionList = [];
 
     const questionBox = document.getElementById("question");
     const scoreBox = document.getElementById("score");
 
-    let questionList = [];
+    // Real-time opponent score tracking:
+    async function setupOpponentListener() {
+      const gameRef = doc(db, "matchmaking", gameId);
+      return onSnapshot(gameRef, (docSnapshot) => {
+        const gameData = docSnapshot.data();
+        const isPlayer1 = gameData.player1 === uid;
+        const opponentData = isPlayer1 ? gameData.p2 : gameData.p1;
+        
+        if (opponentData) {
+          // Assuming opponent's score is the first element in the array.
+          const opponentScore = opponentData[0];
+          const opponentScoreElem = document.getElementById("opponentScore");
+          if(opponentScoreElem) {
+            opponentScoreElem.textContent = `Score: ${opponentScore}`;
+          }
+        }
+      });
+    }
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        let cor=0;let incor=0;let sk=0;
         uid = user.uid;
-        const userRef = doc(db, "users", uid);
+        // Use the user's email as the document ID.
+        const userRef = doc(db, "users", user.email);
         const userSnap = await getDoc(userRef);
-        const data = await userSnap.data();
+        const data = userSnap.data();
 
-        document.getElementById("p1name").innerText = await data.name;
-        document.getElementById("p1pic").src = await data.profile || "default.png";
-        console.log(gameId);
+        // Set player 1 info (logged-in user)
+        document.getElementById("p1name").textContent = data.name;
+        document.getElementById("p1pic").src = data.profile || "default.png";
+
+        // Get game data
         const gameRef = doc(db, "matchmaking", gameId);
         const gameSnap = await getDoc(gameRef);
-        const gameData = await  gameSnap.data();
-        console.log(gameData);
-        if (gameData.player1 === uid) {
-            const id2=gameData.player2;
-            console.log(id2);
-            const userRef2 = doc(db, "users", id2);
-            const userSnap2 = await getDoc(userRef2);
-            const data2 = userSnap2.data();
-            document.getElementById("p2name").innerText = data2.name;
-            document.getElementById("p2pic").src = data2.profile || "default.png";
-        } else {
-            const id1=gameData.player1;
-            console.log(id1);
-            const userRef2 = doc(db, "users", id1);
-            const userSnap2 = await getDoc(userRef2);
-            const data2 = userSnap2.data();
-            document.getElementById("p2name").innerText = data2.name;
-            document.getElementById("p2pic").src = data2.profile || "default.png";
-        }
-        const questionsObj=await gameData.questions;
-        const questions2d=[];
-        // Fetch all 180 questions from the object format (doc per question)
-        for (let i = 1; i <= 180; i++) {
-        const key = "q" + i;
-        if (questionsObj[key]) {
-        questions2d.push(questionsObj[key]);
-  }
-}
-questionList=questions2d;
-console.log(questionList);
+        const gameData = gameSnap.data();
 
+        // Set opponent info by querying the users collection based on opponent uid.
+        let opponentUid;
+        if (gameData.player1 === uid) {
+          opponentUid = gameData.player2;
+        } else {
+          opponentUid = gameData.player1;
+        }
+        const q = query(collection(db, "users"), where("uid", "==", opponentUid));
+        const querySnapshot = await getDocs(q);
+        let opponentData;
+        querySnapshot.forEach((doc) => { opponentData = doc.data(); });
+        if (opponentData) {
+          document.getElementById("p2name").textContent = opponentData.name;
+          document.getElementById("p2pic").src = opponentData.profile || "default.png";
+        }
+
+        // Process questions from gameData.questions
+        const questionsObj = gameData.questions;
+        for (let i = 1; i <= 180; i++) {
+          const key = "q" + i;
+          if (questionsObj[key]) {
+            questionList.push(questionsObj[key]);
+          }
+        }
+
+        // Set up real-time opponent listener
+        await setupOpponentListener();
         startGame();
       }
+    });
 
     function startGame() {
       showQuestion();
@@ -183,35 +272,41 @@ console.log(questionList);
     }
 
     function showQuestion() {
-      const currentDigits = questionList[questionIndex];
-      questionBox.innerText = currentDigits.join(" ");
+      if (questionIndex < questionList.length) {
+        const currentDigits = questionList[questionIndex];
+        questionBox.textContent = currentDigits.join(" ");
+      }
     }
-    document.getElementById("submit").addEventListener("click",submitAnswer);
-    document.getElementById("skip").addEventListener("click",skipQuestion);
+
+    document.getElementById("submit").addEventListener("click", submitAnswer);
+    document.getElementById("skip").addEventListener("click", skipQuestion);
+
     async function submitAnswer() {
-      const input = document.getElementById("answerInput").value;
+      const input = document.getElementById("answerInput").value.trim();
+      if (!input) return;
+      
       try {
         const expression = input.replace(/ /g, '');
         const result = eval(expression);
         if (Math.abs(result - 100) < 1e-6) {
-            cor++;
+          cor++;
           score += 5;
         } else {
-            incor++;
+          incor++;
           score -= 3;
         }
       } catch {
         incor++;
         score -= 3;
       }
-      scoreBox.innerText = score;
+      scoreBox.textContent = score;
       await nextQuestion();
     }
 
     async function skipQuestion() {
-        sk++;
+      sk++;
       score -= 1;
-      scoreBox.innerText = score;
+      scoreBox.textContent = score;
       await nextQuestion();
     }
 
@@ -228,45 +323,42 @@ console.log(questionList);
     function startTimer(duration) {
       let time = duration;
       const timerDisplay = document.getElementById("timer");
-      const interval = setInterval(async () => {
+      timerInterval = setInterval(async () => {
         let minutes = Math.floor(time / 60);
         let seconds = time % 60;
-        timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds
-          .toString()
-          .padStart(2, '0')}`;
-
+        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         if (--time < 0) {
-          clearInterval(interval);
-          console.log("EndGame");
+          clearInterval(timerInterval);
           await endGame();
         }
       }, 1000);
     }
 
     async function endGame() {
-        console.log("Times Up");
+      clearInterval(timerInterval);
+      
       const gameRef = doc(db, "matchmaking", gameId);
       const gameSnap = await getDoc(gameRef);
-        const gameData = await  gameSnap.data();
-        let id2;
-        const game=doc(db,"matchmaking",(gameId).toString());
-      if(gameData.player1 === uid){
-        updateDoc(game,{p1: [score,cor,incor,sk]});
-        id2=gameData.player2;
-      }
-      else{
-        id2=gameData.player1;
-        updateDoc(game,{p2: [score,cor,incor,sk]});
-      }
-      const player=doc(db,"users",uid);
-      const pld=await getDoc(player);
-      const num=await pld.data().num;
-      num++;
-      updateDoc(player,{num:num, game_id:gameId});
-      alert("Time's up! Final Score: " + score);
-      window.location.href = "result.html"; // Optional redirect
+      const gameData = gameSnap.data();
+      
+      const isPlayer1 = gameData.player1 === uid;
+      await updateDoc(gameRef, {
+        [isPlayer1 ? 'p1' : 'p2']: [score, cor, incor, sk]
+      });
+
+      // Update user stats in their document (using the user's email as ID)
+      const playerRef = doc(db, "users", auth.currentUser.email);
+      const playerSnap = await getDoc(playerRef);
+      const playerData = playerSnap.data();
+      
+      await updateDoc(playerRef, {
+        num: (playerData.num || 0) + 1,
+        game_id: gameId
+      });
+
+      // Navigate to the results page (which can then store history)
+      window.location.href = "result.html";
     }
-});
   </script>
 </body>
 </html>
