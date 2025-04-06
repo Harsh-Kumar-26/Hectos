@@ -6,6 +6,38 @@
   <title>Login | HectoClash</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    img {
+      width: 20vw;
+      height: 10vh;
+    }
+    
+    .math-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .math-symbol {
+      position: absolute;
+      color: var(--blue-accent);
+      font-weight: bold;
+      animation: float 10s infinite ease-in-out;
+      opacity: 0.6;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
+
     :root {
       --dark-bg: #0d0d0d;
       --blue-primary: #1e90ff;
@@ -15,113 +47,144 @@
       --card-bg: rgba(20, 20, 20, 0.95);
       --btn-bg: #1e90ff;
       --btn-hover: #00aaff;
+      --input-bg: rgba(30, 30, 30, 0.8);
+      --border: #333;
     }
 
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
     }
-    .card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 25px var(--blue-accent), 0 0 40px var(--neon-blue);
-}
-
 
     body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: var(--dark-bg);
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+      color: var(--light-text);
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      color: var(--light-text);
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 204, 255, 0.15), transparent 70%);
+      animation: pulse 5s infinite;
+      z-index: -1;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
     }
 
     .card {
-      background-color: var(--card-bg);
-      padding: 2.5rem;
-      border-radius: 18px;
-      box-shadow: 0 0 20px var(--blue-accent);
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      max-width: 400px;
       width: 100%;
-      max-width: 420px;
-      transition: all 0.3s ease;
+      border: 1px solid var(--border);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 25px var(--blue-accent), 0 0 40px var(--neon-blue);
     }
 
     .logo {
-      text-align: center;
-      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
       font-weight: 700;
-      color: var(--neon-blue);
-      margin-bottom: 1rem;
-    }
-
-    h2 {
       color: var(--blue-primary);
       margin-bottom: 1.5rem;
-      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .card h2 {
+      color: var(--blue-accent);
+      margin-bottom: 1.5rem;
       text-align: center;
+      font-size: 1.8rem;
     }
 
     .input-group {
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
     }
 
     .input-group label {
       display: block;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
       color: var(--light-text);
       font-size: 0.95rem;
     }
 
     .input-group input {
       width: 100%;
-      padding: 11px 14px;
+      padding: 12px 16px;
       border-radius: 8px;
-      border: 1px solid var(--blue-accent);
-      background-color: #1a1a1a;
-      font-size: 1rem;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
       color: var(--light-text);
-      transition: border 0.3s, box-shadow 0.3s;
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     .input-group input:focus {
       outline: none;
       border-color: var(--neon-blue);
-      box-shadow: 0 0 5px var(--neon-blue);
+      box-shadow: 0 0 8px rgba(0, 170, 255, 0.4);
     }
 
     .btn {
       width: 100%;
-      padding: 12px;
-      background-color: var(--btn-bg);
+      padding: 14px;
+      background: var(--btn-bg);
       color: white;
       border: none;
       border-radius: 8px;
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.3s ease, transform 0.2s;
+      transition: background 0.3s ease, transform 0.3s ease;
+      margin-top: 0.5rem;
     }
 
     .btn:hover {
-      background-color: var(--btn-hover);
+      background: var(--btn-hover);
       transform: translateY(-2px);
     }
 
     .bottom-links {
       margin-top: 1.5rem;
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      color: var(--light-text);
     }
 
     .bottom-links a {
-      color: var(--blue-accent);
+      color: var(--blue-primary);
       text-decoration: none;
       font-weight: 600;
+      transition: color 0.3s ease;
     }
 
     .bottom-links a:hover {
+      color: var(--neon-blue);
       text-decoration: underline;
     }
 
@@ -129,64 +192,94 @@
       .card {
         padding: 1.5rem;
       }
+      
+      .card h2 {
+        font-size: 1.5rem;
+      }
+      
+      .logo {
+        font-size: 1.5rem;
+      }
+      
+      img {
+        width: 40vw;
+        height: auto;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">🔥 HectoClash</div>
-    <h2>Login to Continue</h2>
-    <div class="input-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Enter your email" />
+    <div class="math-bg" id="math-bg"></div>
+    <div class="animated-bg"></div>
+  
+    <div class="card">
+      <div class="logo"><img src="Frame 545.png"></div>
+      <h2>Login to Continue</h2>
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" />
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" />
+      </div>
+      <button class="btn" onclick="login()">Login</button>
+
+      <div class="bottom-links">
+        <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+      </div>
     </div>
-    <div class="input-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter your password" />
-    </div>
-    <button class="btn" onclick="login()">Login</button>
 
-    <div class="bottom-links">
-      <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
-    </div>
-  </div>
+    <!-- Firebase Script -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
-  <!-- Firebase Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
+        authDomain: "techsprint-53b5c.firebaseapp.com",
+        projectId: "techsprint-53b5c",
+        storageBucket: "techsprint-53b5c.appspot.com",
+        messagingSenderId: "366810852442",
+        appId: "1:366810852442:web:d31260159a6c8b1c307c63",
+        measurementId: "G-PTPH19Z3QG"
+      };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
-      authDomain: "techsprint-53b5c.firebaseapp.com",
-      projectId: "techsprint-53b5c",
-      storageBucket: "techsprint-53b5c.appspot.com",
-      messagingSenderId: "366810852442",
-      appId: "1:366810852442:web:d31260159a6c8b1c307c63",
-      measurementId: "G-PTPH19Z3QG"
-    };
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+      window.login = function () {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-    window.login = function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+        if (!email || !password) {
+          alert("Please fill all fields.");
+          return;
+        }
 
-      if (!email || !password) {
-        alert("Please fill all fields.");
-        return;
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            window.location.href = "mainpage.html";
+          })
+          .catch((error) => {
+            alert("Login failed: " + error.message);
+          });
+      };
+      
+      const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+      const container = document.getElementById('math-bg');
+
+      for (let i = 0; i < 100; i++) {
+        const symbol = document.createElement('div');
+        symbol.classList.add('math-symbol');
+        symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        symbol.style.left = Math.random() * 100 + 'vw';
+        symbol.style.top = Math.random() * 100 + 'vh';
+        symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+        symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+        container.appendChild(symbol);
       }
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          alert("Login successful! Redirecting...");
-          window.location.href = "mainpage.html";
-        })
-        .catch((error) => {
-          alert("Login failed: " + error.message);
-        });
-    };
-  </script>
+      
+    </script>
 </body>
 </html>
