@@ -141,7 +141,7 @@
       background: var(--neon-blue);
       color: var(--dark-bg);
     }
-    .num-btn:hover {
+    .num-btn:hover:not(:disabled) {
       background: var(--btn-hover);
       transform: translateY(-2px);
     }
@@ -155,20 +155,61 @@
       .question { font-size: 1.5rem; }
       .input-area { flex-direction: column; align-items: center; }
     }
+    .math-symbol {
+      position: absolute;
+      font-size: 2rem;
+      color: var(--blue-accent);
+      animation: float 10s infinite ease-in-out;
+      opacity: 0.6;
+    }
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
+    .butn {
+      background-color: black;
+      color: white;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: 2px solid;
+      border-image: linear-gradient(to right, blue, white) 1;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    .butn:hover {
+      background-color: #111;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 0, 255, 0.5);
+    }
+    .math-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: -1;
+    }
   </style>
 </head>
 <body>
   <div class="animated-bg"></div>
+  <div class="math-bg" id="math-bg"></div>
   <div class="container">
     <div class="header">
+      <!-- Static names: "You" and "Opponent" -->
       <div class="player" id="player1">
-        <img src="" id="p1pic" alt="Player 1" />
-        <span id="p1name">Player 1</span>
+        <span id="p1name">You</span>
       </div>
       <div class="timer" id="timer">03:00</div>
       <div class="player" id="player2">
-        <span id="p2name">Player 2</span>
-        <img src="" id="p2pic" alt="Player 2" />
+        <span id="p2name">Opponent</span>
         <div class="score" id="opponentScore">Score: 0</div>
       </div>
     </div>
@@ -184,11 +225,12 @@
       <button class="operator-btn" data-operator="/">÷</button>
       <button class="operator-btn" data-operator="(">(</button>
       <button class="operator-btn" data-operator=")">)</button>
+      <button class="operator-btn" data-operator="^">^</button>
       <button class="operator-btn" id="backspace">⌫</button>
     </div>
     <div class="input-area">
-      <button id="submit">Submit</button>
-      <button id="skip">Skip</button>
+      <button id="submit" class="btn">Submit</button>
+      <button id="skip" class="butn">Skip</button>
     </div>
   </div>
 
@@ -231,23 +273,34 @@
     let cor = 0, incor = 0, sk = 0;
     let timerInterval;
     let questionList = [];
+    // Stack to track used number buttons
+    let usedButtonsStack = [];
 
     const questionBox = document.getElementById("question");
     const scoreBox = document.getElementById("score");
 
+    // Create number buttons from the given array. Each button can only be used once.
     function createNumberButtons(numbers) {
       questionBox.innerHTML = '';
-      numbers.forEach(num => {
+      // Clear any previously used buttons
+      usedButtonsStack = [];
+      numbers.forEach((num, index) => {
         const btn = document.createElement('button');
         btn.className = 'num-btn';
         btn.textContent = num;
+        // Save a unique id for each button based on index
+        btn.dataset.idx = index;
         btn.addEventListener('click', () => {
+          // Append number and disable the button
           document.getElementById("answerInput").value += num;
+          btn.disabled = true;
+          usedButtonsStack.push(btn);
         });
         questionBox.appendChild(btn);
       });
     }
 
+    // Operator buttons append their operator (they are reusable)
     document.querySelectorAll('.operator-btn').forEach(btn => {
       if(btn.id !== 'backspace') {
         btn.addEventListener('click', () => {
@@ -256,24 +309,44 @@
       }
     });
 
+    // Backspace: remove the last character.
+    // If the removed character was a digit coming from a number button, re-enable that button.
     document.getElementById("backspace").addEventListener('click', () => {
       const input = document.getElementById("answerInput");
+      if (input.value.length === 0) return;
+      const lastChar = input.value.slice(-1);
+      // Check if the last character is a digit (number buttons produce single-digit numbers)
+      if (/\d/.test(lastChar) && usedButtonsStack.length > 0) {
+        // Re-enable the last used number button
+        const btn = usedButtonsStack.pop();
+        btn.disabled = false;
+      }
       input.value = input.value.slice(0, -1);
     });
 
+    // Prevent manual input into the answer field
     document.getElementById("answerInput").addEventListener('keydown', (e) => {
       e.preventDefault();
     });
 
+    // Animated math background symbols
+    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+    const container = document.getElementById('math-bg');
+    for (let i = 0; i < 100; i++) {
+      const symbol = document.createElement('div');
+      symbol.classList.add('math-symbol');
+      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      symbol.style.left = Math.random() * 100 + 'vw';
+      symbol.style.top = Math.random() * 100 + 'vh';
+      symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+      symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+      container.appendChild(symbol);
+    }
+      
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         uid = user.uid;
-        const userRef = doc(db, "users", user.email);
-        const userSnap = await getDoc(userRef);
-        const data = userSnap.data();
-
-        document.getElementById("p1name").textContent = data.name;
-        // document.getElementById("p1pic").src = data.profile || "default.png";
+        // Using static names: "You" and "Opponent", so we do not update based on user data
 
         const gameRef = doc(db, "matchmaking", gameId);
         const gameSnap = await getDoc(gameRef);
@@ -289,28 +362,15 @@
           gameData = { ...gameData, questions };
         }
 
+        // Determine opponent UID without fetching name (only used for score updates)
         let opponentUid;
         if (gameData.player1 === uid) {
           opponentUid = gameData.player2;
         } else {
           opponentUid = gameData.player1;
         }
-        const usersCollection = collection(db, "users");
-        const q = query(usersCollection, where("uid", "==", opponentUid));
-        const querySnapshot = await getDocs(q);
-        let opponentData;
-        querySnapshot.forEach(docSnap => { opponentData = docSnap.data(); });
-        if (opponentData) {
-          document.getElementById("p2name").textContent = opponentData.name;
-          // document.getElementById("p2pic").src = opponentData.profile || "default.png";
-        }
-
-        // Ensure that the questions array only includes valid arrays (length 6)
-        questionList = Object.values(gameData.questions)
-          .slice(0, 10)
-          .filter(q => Array.isArray(q) && q.length === 6);
-
-        // Listen for game document changes using modular onSnapshot
+        
+        // Listen for game document changes to update opponent's score dynamically
         onSnapshot(gameRef, (docSnapshot) => {
           const gameData = docSnapshot.data();
           const isPlayer1 = gameData.player1 === uid;
@@ -320,10 +380,16 @@
           }
         });
 
+        // Ensure that the questions array only includes valid arrays (length 6)
+        questionList = Object.values(gameData.questions)
+          .slice(0, 10)
+          .filter(q => Array.isArray(q) && q.length === 6);
+
         startGame();
       }
     });
 
+    // Fetch a valid question: an array of 6 single-digit numbers.
     async function generateValidQuestion() {
       try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyA4c9l0IieSxZXoX9ehc1zX0aMBBH-MuAs`, {
@@ -434,7 +500,7 @@
         console.error("Transaction failed: ", e);
       }
 
-      // Update user stats in their document
+      // Update user stats in their document (if needed)
       const playerRef = doc(db, "users", auth.currentUser.email);
       const playerSnap = await getDoc(playerRef);
       const playerData = playerSnap.data();
@@ -443,6 +509,20 @@
         num: (playerData.num || 0) + 1,
         game_id: gameId
       });
+
+      // After updating the game doc, retrieve final scores and store in local storage.
+      const updatedGameSnap = await getDoc(gameRef);
+      const updatedGameData = updatedGameSnap.data();
+      const isPlayer1 = updatedGameData.player1 === uid;
+      let finalUserScore, finalOpponentScore;
+      if (isPlayer1) {
+        finalUserScore = updatedGameData.p1 ? updatedGameData.p1[0] : score;
+        finalOpponentScore = updatedGameData.p2 ? updatedGameData.p2[0] : 0;
+      } else {
+        finalUserScore = updatedGameData.p2 ? updatedGameData.p2[0] : score;
+        finalOpponentScore = updatedGameData.p1 ? updatedGameData.p1[0] : 0;
+      }
+      localStorage.setItem('finalScores', JSON.stringify({ user: finalUserScore, opponent: finalOpponentScore }));
 
       window.location.href = "result.html";
     }
