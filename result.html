@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Game Result</title>
+  <link href="Frame 545.png" rel="icon">
   <style>
     body {
       margin: 0;
@@ -16,10 +17,16 @@
       align-items: center;
       min-height: 100vh;
     }
-    img{
-    width: 20vw;
-    height: 10vh;
-   }
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 204, 255, 0.15), transparent 70%);
+      animation: pulse 5s infinite;
+      z-index: -1;
+    }
    .math-bg {
   position: absolute;
   top: 0;
@@ -109,6 +116,7 @@
   </style>
 </head>
 <body>
+
     <div class="math-bg" id="math-bg"></div>
   <div class="animated-bg"></div>
   <div class="container">
