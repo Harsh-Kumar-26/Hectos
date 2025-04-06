@@ -18,6 +18,111 @@
       --btn-hover: #00aaff;
       --border: #333;
     }
+
+    /* Consistent Navbar Styles */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 204, 255, 0.2);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+
+    .nav-logo {
+      height: 40px;
+      transition: transform 0.3s ease;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      background: rgba(0, 204, 255, 0.1);
+      color: #00ccff;
+    }
+
+    .nav-link.active {
+      color: #00ccff;
+      font-weight: bold;
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      background: #00ccff;
+      border-radius: 50%;
+    }
+
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .profile-dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: rgba(30, 30, 30, 0.95);
+      border: 1px solid #333;
+      border-radius: 8px;
+      min-width: 180px;
+      padding: 0.5rem 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .dropdown-content a {
+      color: #e0e0e0;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      display: block;
+      transition: background 0.3s ease;
+    }
+
+    .dropdown-content a:hover {
+      background: rgba(0, 204, 255, 0.1);
+    }
+
+    .show-dropdown {
+      display: block !important;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Page Specific Styles */
     .math-bg {
       position: absolute;
       top: 0;
@@ -37,69 +142,17 @@
     }
 
     @keyframes float {
-      0% {
-        transform: translateY(100vh) rotate(0deg);
-      }
-      100% {
-        transform: translateY(-100vh) rotate(360deg);
-      }
+      0% { transform: translateY(100vh) rotate(0deg); }
+      100% { transform: translateY(-100vh) rotate(360deg); }
     }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    img{
-    width: 30vw;
-    height: 6vh;
-   }
+
     body {
       background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1a1a 100%);
       color: var(--light-text);
       min-height: 100vh;
-      padding-top: 60px; /* accommodate navbar height */
+      padding-top: 70px; /* Navbar height */
     }
-    /* Navbar styling */
-    nav {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 20px;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    nav .logo {
-      font-size: 1.8rem;
-      color: var(--blue-primary);
-      text-decoration: none;
-    }
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 20px;
-    }
-    nav ul li a {
-      color: var(--light-text);
-      text-decoration: none;
-      font-size: 1rem;
-      transition: color 0.3s ease;
-    }
-    nav ul li a:hover, nav ul li a.active {
-      color: var(--blue-accent);
-    }
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    header h1 {
-      font-size: 2.5rem;
-      color: var(--blue-primary);
-    }
+
     .container {
       background: var(--card-bg);
       padding: 2rem;
@@ -109,37 +162,43 @@
       max-width: 1000px;
       margin: 0 auto;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 1rem;
     }
+
     table th, table td {
       padding: 1rem;
       border: 1px solid var(--border);
       text-align: center;
     }
+
     table th {
       background: var(--blue-accent);
     }
+
     .no-history {
       text-align: center;
       margin-top: 2rem;
       font-size: 1.2rem;
       color: var(--blue-primary);
     }
-    /* Chart styling: place below table */
+
     #chartContainer {
       margin-top: 2rem;
       background: var(--card-bg);
       padding: 1rem;
       border-radius: 10px;
     }
+
     canvas {
       display: block;
       width: 100%;
       max-width: 100%;
     }
+
     .animated-bg {
       position: fixed;
       top: 0;
@@ -150,26 +209,57 @@
       animation: pulse 5s infinite;
       z-index: -1;
     }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+      .nav-links {
+        gap: 1rem;
+      }
+      .nav-link {
+        font-size: 1rem;
+        padding: 0.5rem;
+      }
+    }
   </style>
 </head>
 <body>
-    <div class="animated-bg"></div>
-    <div class="math-bg" id="math-bg"></div>
-  <nav>
-    <a href="index.html" class="logo"><img src="Frame 545.png"></a>
-    <ul>
-      <li><a href="mainpage.html">Home</a></li>
-      <li><a href="practice.html">Practice</a></li>
-      <li><a href="history.html" class="active">History</a></li>
-      <li><a href="login.html">Logout</a></li>
-    </ul>
+  <div class="animated-bg"></div>
+  <div class="math-bg" id="math-bg"></div>
+
+  <!-- Consistent Navbar -->
+  <nav class="navbar">
+    <a href="mainpage.html" class="nav-logo">
+      <img src="Frame 545.png" alt="HectoClash" class="nav-logo" style="width: 20vw; height: 5vh;">
+    </a>
+    
+    <div class="nav-links">
+      <a href="mainpage.html" class="nav-link">Home</a>
+      <a href="practice.html" class="nav-link">Practice</a>
+      <a href="history.html" class="nav-link active">History</a>
+      <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+      
+      <div class="profile-section">
+        <div class="profile-dropdown">
+          <button class="nav-link" id="profileToggle">
+            <span id="navEmail" style="color: #121212; width: 8vw; margin-right: 5vw; height: auto;"></span>
+          </button>
+          <div class="dropdown-content" id="profileDropdown">
+            <a href="profile.html">Profile</a>
+            <a href="help.html">Help</a>
+            <a href="#" id="logoutBtn">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </nav>
 
   <header>
     <h1 style="margin-top: 3vh;">Contest History</h1>
   </header>
+  
   <div class="container">
-    <!-- History Table -->
     <table id="historyTable">
       <thead>
         <tr>
@@ -184,14 +274,11 @@
           <th>Date</th>
         </tr>
       </thead>
-      <tbody id="historyBody">
-        <!-- History rows will be injected here -->
-      </tbody>
+      <tbody id="historyBody"></tbody>
     </table>
     <div class="no-history" id="noHistory" style="display:none;">
       No contest history available.
     </div>
-    <!-- Chart Container below the table -->
     <div id="chartContainer">
       <canvas id="historyChart"></canvas>
     </div>
@@ -200,7 +287,7 @@
   <!-- Firebase Scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -217,75 +304,86 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const historyBody = document.getElementById("historyBody");
-    const noHistoryDiv = document.getElementById("noHistory");
-    const chartCanvas = document.getElementById("historyChart");
+    // Navbar functionality
+    document.getElementById('profileToggle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('profileDropdown').classList.toggle('show-dropdown');
+    });
 
-    // Helper function to format Firestore timestamp to locale string
-    function formatTimestamp(timestamp) {
-      if (timestamp && timestamp.toDate) {
-        return timestamp.toDate().toLocaleString();
-      } else if (timestamp instanceof Date) {
-        return timestamp.toLocaleString();
-      }
-      return timestamp || "";
-    }
-
-    // Prepare data arrays for Chart.js
-    let chartLabels = [];
-    let chartData = [];
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Use the user's email as document ID
-        const userDocRef = doc(db, "users", user.email);
-        const userSnap = await getDoc(userDocRef);
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          const history = userData.history || [];
-          
-          if (history.length === 0) {
-            noHistoryDiv.style.display = "block";
-          } else {
-            // Sort history by timestamp
-            history.sort((a, b) => {
-              return new Date(a.timestamp.toDate ? a.timestamp.toDate() : a.timestamp) - new Date(b.timestamp.toDate ? b.timestamp.toDate() : b.timestamp);
-            });
-            history.forEach(game => {
-              const tr = document.createElement("tr");
-              const dateStr = formatTimestamp(game.timestamp);
-              tr.innerHTML = `
-                <td>${game.gameId || "-"}</td>
-                <td>${game.finalScore || 0}</td>
-                <td>${game.questionsAttempted || 0}</td>
-                <td>${game.correctAnswers || 0}</td>
-                <td>${game.skippedQuestions || 0}</td>
-                <td>${game.ratingChange >= 0 ? "+" + game.ratingChange : game.ratingChange}</td>
-                <td>${game.newRating || "-"}</td>
-                <td>${game.outcome || "-"}</td>
-                <td>${dateStr}</td>
-              `;
-              historyBody.appendChild(tr);
-              
-              // For chart: use date as label and final score as data
-              chartLabels.push(dateStr);
-              chartData.push(game.finalScore || 0);
-            });
-          }
-          // Build the chart after loading history
-          buildChart();
-        } else {
-          noHistoryDiv.style.display = "block";
-        }
-      } else {
-        window.location.href = "login.html";
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.profile-dropdown')) {
+        document.getElementById('profileDropdown').classList.remove('show-dropdown');
       }
     });
 
-    function buildChart() {
-      // Create a line chart using Chart.js with dark theme settings
-      const ctx = chartCanvas.getContext("2d");
-      new Chart(ctx, {
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      signOut(auth).then(() => {
+        window.location.href = 'index.html';
+      }).catch((error) => {
+        console.error('Logout error:', error);
+      });
+    });
+
+    // Auth state handler
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('navEmail').textContent = user.email;
+        loadHistory(user);
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // History loading logic
+    async function loadHistory(user) {
+      const historyBody = document.getElementById("historyBody");
+      const noHistoryDiv = document.getElementById("noHistory");
+      const chartCanvas = document.getElementById("historyChart");
+
+      const userDocRef = doc(db, "users", user.email);
+      const userSnap = await getDoc(userDocRef);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        const history = userData.history || [];
+        
+        if (history.length === 0) {
+          noHistoryDiv.style.display = "block";
+        } else {
+          history.sort((a, b) => new Date(a.timestamp?.toDate?.() || a.timestamp) - new Date(b.timestamp?.toDate?.() || b.timestamp));
+          history.forEach(game => {
+            const tr = document.createElement("tr");
+            const dateStr = formatTimestamp(game.timestamp);
+            tr.innerHTML = `
+              <td>${game.gameId || "-"}</td>
+              <td>${game.finalScore || 0}</td>
+              <td>${game.questionsAttempted || 0}</td>
+              <td>${game.correctAnswers || 0}</td>
+              <td>${game.skippedQuestions || 0}</td>
+              <td>${game.ratingChange >= 0 ? "+" + game.ratingChange : game.ratingChange}</td>
+              <td>${game.newRating || "-"}</td>
+              <td>${game.outcome || "-"}</td>
+              <td>${dateStr}</td>
+            `;
+            historyBody.appendChild(tr);
+          });
+          buildChart(history);
+        }
+      } else {
+        noHistoryDiv.style.display = "block";
+      }
+    }
+
+    function formatTimestamp(timestamp) {
+      return timestamp?.toDate?.().toLocaleString() || new Date(timestamp).toLocaleString() || "-";
+    }
+
+    function buildChart(history) {
+      const chartLabels = history.map(game => formatTimestamp(game.timestamp));
+      const chartData = history.map(game => game.finalScore || 0);
+      
+      new Chart(document.getElementById('historyChart').getContext('2d'), {
         type: 'line',
         data: {
           labels: chartLabels,
@@ -302,49 +400,32 @@
         },
         options: {
           scales: {
-            x: {
-              title: {
-                display: true,
-                text: 'Date',
-                color: '#e0e0e0'
-              },
-              ticks: {
-                color: '#e0e0e0'
-              },
-              grid: {
-                color: 'rgba(255,255,255,0.1)'
-              }
+            x: { 
+              title: { display: true, text: 'Date', color: '#e0e0e0' },
+              ticks: { color: '#e0e0e0' },
+              grid: { color: 'rgba(255,255,255,0.1)' }
             },
-            y: {
-              title: {
-                display: true,
-                text: 'Final Score',
-                color: '#e0e0e0'
-              },
+            y: { 
+              title: { display: true, text: 'Final Score', color: '#e0e0e0' },
               beginAtZero: true,
-              ticks: {
-                color: '#e0e0e0'
-              },
-              grid: {
-                color: 'rgba(255,255,255,0.1)'
-              }
+              ticks: { color: '#e0e0e0' },
+              grid: { color: 'rgba(255,255,255,0.1)' }
             }
           },
           plugins: {
             legend: {
               display: true,
               position: 'top',
-              labels: {
-                color: '#e0e0e0'
-              }
+              labels: { color: '#e0e0e0' }
             }
           }
         }
       });
     }
+
+    // Math symbols background
     const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
     const container = document.getElementById('math-bg');
-
     for (let i = 0; i < 100; i++) {
       const symbol = document.createElement('div');
       symbol.classList.add('math-symbol');
