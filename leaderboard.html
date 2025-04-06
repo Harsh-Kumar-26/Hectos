@@ -249,7 +249,6 @@
         <th>Rank</th>
         <th>User</th>
         <th>Rating</th>
-        <th>Highest Rating</th>
       </tr>
     </thead>
     <tbody id="leaderboard-body">
@@ -320,11 +319,11 @@
           const data = doc.data();
           users.push({
             email: doc.id,
-            rating: data.rating || 0,
-            highestRating: data.highestRating || 0
+            rating: data.rating || 0
           });
         });
 
+        // Sort users in descending order of rating
         users.sort((a, b) => b.rating - a.rating);
 
         users.forEach((user, index) => {
@@ -341,7 +340,6 @@
             <td>${rankDisplay}</td>
             <td>${user.email}</td>
             <td>${user.rating}</td>
-            <td>${user.highestRating}</td>
           `;
           leaderboardBody.appendChild(tr);
         });
