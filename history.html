@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HectoClash</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contest History | HectoClash</title>
+  <!-- Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --dark-bg: #0d0d0d;
@@ -12,34 +13,116 @@
       --blue-accent: #00aaff;
       --neon-blue: #00ccff;
       --light-text: #e0e0e0;
+      --card-bg: rgba(20, 20, 20, 0.95);
       --btn-bg: #1e90ff;
       --btn-hover: #00aaff;
-    }
-  
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --border: #333;
     }
 
-    body {
-      background-color: var(--dark-bg);
-      color: var(--light-text);
-      overflow: hidden;
+    /* Consistent Navbar Styles */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 204, 255, 0.2);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
     }
 
-    header {
-      text-align: center;
-      padding: 3rem 1rem;
+    .nav-logo {
+      height: 40px;
+      transition: transform 0.3s ease;
     }
 
-    header h1 {
-      font-size: 4rem;
-      color: var(--blue-primary);
-      text-shadow: 0 0 15px var(--neon-blue);
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
     }
 
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      background: rgba(0, 204, 255, 0.1);
+      color: #00ccff;
+    }
+
+    .nav-link.active {
+      color: #00ccff;
+      font-weight: bold;
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      background: #00ccff;
+      border-radius: 50%;
+    }
+
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .profile-dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: rgba(30, 30, 30, 0.95);
+      border: 1px solid #333;
+      border-radius: 8px;
+      min-width: 180px;
+      padding: 0.5rem 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .dropdown-content a {
+      color: #e0e0e0;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      display: block;
+      transition: background 0.3s ease;
+    }
+
+    .dropdown-content a:hover {
+      background: rgba(0, 204, 255, 0.1);
+    }
+
+    .show-dropdown {
+      display: block !important;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Page Specific Styles */
     .math-bg {
       position: absolute;
       top: 0;
@@ -59,108 +142,287 @@
     }
 
     @keyframes float {
-      0% {
-        transform: translateY(100vh) rotate(0deg);
-      }
-      100% {
-        transform: translateY(-100vh) rotate(360deg);
-      }
+      0% { transform: translateY(100vh) rotate(0deg); }
+      100% { transform: translateY(-100vh) rotate(360deg); }
     }
 
-    .content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: auto;
-      gap: 2rem;
+    body {
+      background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1a1a 100%);
+      color: var(--light-text);
+      min-height: 100vh;
+      padding-top: 70px; /* Navbar height */
+    }
+
+    .container {
+      background: var(--card-bg);
       padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      max-width: 1000px;
+      margin: 0 auto;
     }
 
-    .get-started {
-      padding: 1rem 2.5rem;
-      background-color: var(--btn-bg);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: background-color 0.3s, transform 0.3s;
-      box-shadow: 0 0 15px var(--btn-bg);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
     }
 
-    .get-started:hover {
-      background-color: var(--btn-hover);
-      transform: scale(1.05);
-      box-shadow: 0 0 25px var(--btn-hover);
-    }
-
-    .advantages {
-      margin-top: 2rem;
-      max-width: 800px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 2rem 2.5rem;
-      border-radius: 16px;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .advantages h2 {
-      color: var(--neon-blue);
-      font-size: 2rem;
-      margin-bottom: 1rem;
+    table th, table td {
+      padding: 1rem;
+      border: 1px solid var(--border);
       text-align: center;
     }
 
-    .advantages ul {
-      list-style: none;
-      padding-left: 0;
+    table th {
+      background: var(--blue-accent);
     }
 
-    .advantages li {
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
-      padding-left: 1.5rem;
-      position: relative;
-    }
-
-    .advantages li::before {
-      content: "✔";
-      position: absolute;
-      left: 0;
+    .no-history {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 1.2rem;
       color: var(--blue-primary);
-      font-weight: bold;
+    }
+
+    #chartContainer {
+      margin-top: 2rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 204, 255, 0.15), transparent 70%);
+      animation: pulse 5s infinite;
+      z-index: -1;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+      .nav-links {
+        gap: 1rem;
+      }
+      .nav-link {
+        font-size: 1rem;
+        padding: 0.5rem;
+      }
     }
   </style>
 </head>
-
 <body>
+  <div class="animated-bg"></div>
   <div class="math-bg" id="math-bg"></div>
 
-  <header style="margin-bottom: 0; padding-bottom: 0;">
-    <img src="Frame 545.png" alt="HectoClash Logo" style="width: 30vw; height: auto; margin-bottom: 1rem;" />
+  <!-- Consistent Navbar -->
+  <nav class="navbar">
+    <a href="mainpage.html" class="nav-logo">
+      <img src="Frame 545.png" alt="HectoClash" class="nav-logo" style="width: 20vw; height: 5vh;">
+    </a>
+    
+    <div class="nav-links">
+      <a href="mainpage.html" class="nav-link">Home</a>
+      <a href="practice.html" class="nav-link">Practice</a>
+      <a href="history.html" class="nav-link active">History</a>
+      <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+      
+      <div class="profile-section">
+        <div class="profile-dropdown">
+          <button class="nav-link" id="profileToggle">
+            <span id="navEmail" style="color: #121212; width: 8vw; margin-right: 5vw; height: auto;"></span>
+          </button>
+          <div class="dropdown-content" id="profileDropdown">
+            <a href="profile.html">Profile</a>
+            <a href="help.html">Help</a>
+            <a href="#" id="logoutBtn">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header>
+    <h1 style="margin-top: 3vh;">Contest History</h1>
   </header>
-
-  <div class="content" id="main-content">
-    <p style="font-size: 1.2rem; text-align: center; max-width: 600px;">Your adventure in the world of math begins here! Compete, learn, and grow with a community of math lovers.</p>
-    <button class="get-started" onclick="startAdventure()">Getting Started</button>
-
-    <div class="advantages">
-      <h2>Why Choose HectoClash?</h2>
-      <ul>
-        <li>Real-time duels to challenge friends or strangers.</li>
-        <li>Engaging math games to sharpen your skills.</li>
-        <li>Secure and smooth sign-in with robust authentication.</li>
-        <li>Global leaderboards and ranking system for motivation.</li>
-        <li>Detailed performance breakdown through interactive charts.</li>
-      </ul>
+  
+  <div class="container">
+    <!-- Updated table header: removed "Rating Change" and "New Rating" columns -->
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Game ID</th>
+          <th>Final Score</th>
+          <th>Questions Attempted</th>
+          <th>Correct Answers</th>
+          <th>Skipped</th>
+          <th>Outcome</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+    <div class="no-history" id="noHistory" style="display:none;">
+      No contest history available.
+    </div>
+    <div id="chartContainer">
+      <canvas id="historyChart"></canvas>
     </div>
   </div>
 
-  <script>
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
+      authDomain: "techsprint-53b5c.firebaseapp.com",
+      projectId: "techsprint-53b5c",
+      storageBucket: "techsprint-53b5c.appspot.com",
+      messagingSenderId: "366810852442",
+      appId: "1:366810852442:web:d31260159a6c8b1c307c63",
+      measurementId: "G-PTPH19Z3QG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Navbar functionality
+    document.getElementById('profileToggle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('profileDropdown').classList.toggle('show-dropdown');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.profile-dropdown')) {
+        document.getElementById('profileDropdown').classList.remove('show-dropdown');
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      signOut(auth).then(() => {
+        window.location.href = 'index.html';
+      }).catch((error) => {
+        console.error('Logout error:', error);
+      });
+    });
+
+    // Auth state handler
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('navEmail').textContent = user.email;
+        loadHistory(user);
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // History loading logic
+    async function loadHistory(user) {
+      const historyBody = document.getElementById("historyBody");
+      const noHistoryDiv = document.getElementById("noHistory");
+      const chartCanvas = document.getElementById("historyChart");
+
+      const userDocRef = doc(db, "users", user.email);
+      const userSnap = await getDoc(userDocRef);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        const history = userData.history || [];
+        
+        if (history.length === 0) {
+          noHistoryDiv.style.display = "block";
+        } else {
+          history.sort((a, b) => new Date(a.timestamp?.toDate?.() || a.timestamp) - new Date(b.timestamp?.toDate?.() || b.timestamp));
+          history.forEach(game => {
+            const tr = document.createElement("tr");
+            const dateStr = formatTimestamp(game.timestamp);
+            tr.innerHTML = `
+              <td>${game.gameId || "-"}</td>
+              <td>${game.finalScore || 0}</td>
+              <td>${game.questionsAttempted || 0}</td>
+              <td>${game.correctAnswers || 0}</td>
+              <td>${game.skippedQuestions || 0}</td>
+              <td>${game.outcome || "-"}</td>
+              <td>${dateStr}</td>
+            `;
+            historyBody.appendChild(tr);
+          });
+          buildChart(history);
+        }
+      } else {
+        noHistoryDiv.style.display = "block";
+      }
+    }
+
+    function formatTimestamp(timestamp) {
+      return timestamp?.toDate?.().toLocaleString() || new Date(timestamp).toLocaleString() || "-";
+    }
+
+    function buildChart(history) {
+      const chartLabels = history.map(game => formatTimestamp(game.timestamp));
+      const chartData = history.map(game => game.finalScore || 0);
+      
+      new Chart(document.getElementById('historyChart').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            label: 'Final Score',
+            data: chartData,
+            borderColor: '#1e90ff',
+            backgroundColor: 'rgba(30,144,255,0.2)',
+            fill: true,
+            tension: 0.2,
+            pointRadius: 4,
+            pointBackgroundColor: '#00aaff'
+          }]
+        },
+        options: {
+          scales: {
+            x: { 
+              title: { display: true, text: 'Date', color: '#e0e0e0' },
+              ticks: { color: '#e0e0e0' },
+              grid: { color: 'rgba(255,255,255,0.1)' }
+            },
+            y: { 
+              title: { display: true, text: 'Final Score', color: '#e0e0e0' },
+              beginAtZero: true,
+              ticks: { color: '#e0e0e0' },
+              grid: { color: 'rgba(255,255,255,0.1)' }
+            }
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: { color: '#e0e0e0' }
+            }
+          }
+        }
+      });
+    }
+
+    // Math symbols background
     const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
     const container = document.getElementById('math-bg');
-
     for (let i = 0; i < 100; i++) {
       const symbol = document.createElement('div');
       symbol.classList.add('math-symbol');
@@ -171,11 +433,6 @@
       symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
       container.appendChild(symbol);
     }
-
-    function startAdventure() {
-      window.location.href = 'mainpage.html'; // Redirect to signup page
-    }
   </script>
 </body>
-
 </html>
