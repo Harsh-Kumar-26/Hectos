@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profile | HectoClash</title>
   <link href="Frame 545.png" rel="icon">
@@ -20,7 +20,7 @@
       --border: #333;
     }
 
-    img{
+    img {
         width: 20vw;
         height: 5vh;
     }
@@ -40,7 +40,6 @@
       flex-direction: column;
     }
 
-    
     @keyframes pulse {
       0%, 100% {
         transform: scale(1);
@@ -280,12 +279,11 @@
       height: 20vh;
     }
    
-      
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .math-bg {
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .math-bg {
       position: absolute;
       top: 0;
       left: 0;
@@ -323,11 +321,11 @@
       }
     }
 
-      nav {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 0.5rem;
-      }
+    nav {
+      width: 100%;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+    }
     
   </style>
 </head>
@@ -355,7 +353,6 @@
           <h2 class="profile-name" id="profileName">Player Name</h2>
           <p class="profile-city" id="profileCity">City</p>
         </div>
-        
       </div>
 
       <div class="stats-card">
@@ -364,16 +361,10 @@
           <span class="stat-label">Rating:</span>
           <span class="stat-value" id="ratingDisplay">700</span>
         </div>
-
         <div class="stat-item">
           <span class="stat-label">History Count:</span>
           <span class="stat-value" id="historyCount">0</span>
         </div>
-        <div class="stat-item">
-  <span class="stat-label">Rating:</span>
-  <span class="stat-value" id="ratingDisplay">700</span>
-</div>
-
       </div>
     </div>
   </main>
@@ -418,7 +409,6 @@
     const ratingDisplay = document.getElementById("ratingDisplay");
     const historyCountEl = document.getElementById("historyCount");
     
-
     // Toggle dropdown on profile button click
     profileBtn.addEventListener("click", () => {
       profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
@@ -443,24 +433,18 @@
       window.location.href = "mainpage.html";
     });
 
-    // Edit profile button handler
-    
-
     // Load user data
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         welcomeText.innerText = `Welcome ${user.email}`;
-        
-        // Get user data from Firestore (using user.uid as document ID)
+        // Get user data from Firestore (using user.email as document ID)
         const userDoc = await getDoc(doc(db, "users", user.email));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          
           // Update profile info
-          profileName.textContent = userData.name ;
+          profileName.textContent = userData.name;
           profileCity.textContent = userData.city;
           profileInitial.textContent = userData.name ? userData.name.charAt(0).toUpperCase() : "P";
-          
           // Update stats: rating and history count
           ratingDisplay.textContent = userData.rating || 700;
           const historySize = userData.history && Array.isArray(userData.history)
@@ -472,20 +456,20 @@
         window.location.href = "login.html";
       }
     });
-    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
-      const container = document.getElementById('math-bg');
 
-      for (let i = 0; i < 100; i++) {
-        const symbol = document.createElement('div');
-        symbol.classList.add('math-symbol');
-        symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-        symbol.style.left = Math.random() * 100 + 'vw';
-        symbol.style.top = Math.random() * 100 + 'vh';
-        symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
-        symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
-        container.appendChild(symbol);
-      }
-      
+    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+    const container = document.getElementById('math-bg');
+
+    for (let i = 0; i < 100; i++) {
+      const symbol = document.createElement('div');
+      symbol.classList.add('math-symbol');
+      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      symbol.style.left = Math.random() * 100 + 'vw';
+      symbol.style.top = Math.random() * 100 + 'vh';
+      symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+      symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+      container.appendChild(symbol);
+    }
   </script>
 </body>
 </html>
