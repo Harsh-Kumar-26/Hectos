@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile | HectoClash</title>
+  <style>
+    /* CSS Variables matching index.html */
+    :root {
+      --dark-bg: #0d0d0d;
+      --blue-primary: #1e90ff;
+      --blue-accent: #00aaff;
+      --neon-blue: #00ccff;
+      --light-text: #e0e0e0;
+      --card-bg: rgba(20, 20, 20, 0.95);
+      --btn-bg: #1e90ff;
+      --btn-hover: #00aaff;
+      --input-bg: rgba(30, 30, 30, 0.8);
+      --border: #333;
+    }
+
+    img{
+        width: 20vw;
+        height: 7vh;
+    }
+    /* Global resets matching index.html */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+      color: var(--light-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+    }
+
+    /* Header styling matching index.html */
+    header {
+      width: 100%;
+      background: linear-gradient(90deg, var(--blue-primary), var(--blue-accent));
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    
+    header h1 {
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    
+    header h1:hover {
+      transform: scale(1.05);
+    }
+    
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 1.1rem;
+      position: relative;
+    }
+    
+    nav span {
+      cursor: default;
+    }
+    
+    nav button {
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      font-size: 1.3rem;
+    }
+    
+    nav button:hover {
+      color: var(--neon-blue);
+    }
+
+    /* Profile dropdown matching index.html */
+    .profile-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 3.5rem;
+      background: var(--card-bg);
+      border: 1px solid #333;
+      border-radius: 8px;
+      min-width: 150px;
+      z-index: 10;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+    
+    .profile-dropdown a,
+    .profile-dropdown button {
+      display: block;
+      padding: 0.8rem 1rem;
+      color: var(--light-text);
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    
+    .profile-dropdown a:hover,
+    .profile-dropdown button:hover {
+      background: rgba(0,0,0,0.3);
+    }
+
+    /* Main content styling */
+    main {
+      flex: 1;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .profile-container {
+      width: 100%;
+      max-width: 800px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+    }
+
+    .profile-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border: 2px solid transparent;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+      border-color: var(--neon-blue);
+    }
+
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--blue-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: white;
+    }
+
+    .profile-name {
+      font-size: 1.8rem;
+      color: var(--blue-accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-city {
+      color: var(--light-text);
+      opacity: 0.8;
+    }
+
+    .stats-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border: 2px solid transparent;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+      border-color: var(--neon-blue);
+    }
+
+    .stats-header {
+      font-size: 1.5rem;
+      color: var(--blue-accent);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-item:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      color: var(--light-text);
+      opacity: 0.8;
+    }
+
+    .stat-value {
+      color: var(--neon-blue);
+      font-weight: bold;
+    }
+
+    .edit-btn {
+      background: var(--btn-bg);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .edit-btn:hover {
+      background: var(--btn-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Footer styling matching index.html */
+    footer {
+      background: #111;
+      padding: 2rem;
+      text-align: left;
+      width: 100%;
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+    
+    footer h3 {
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      color: var(--blue-primary);
+    }
+    
+    footer p {
+      margin: 0.4rem 0;
+    }
+    
+    img {
+      width: 30vw;
+      height: 20vh;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .profile-container {
+        grid-template-columns: 1fr;
+      }
+      
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .math-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .math-symbol {
+      position: absolute;
+      color: var(--blue-accent);
+      font-weight: bold;
+      animation: float 10s infinite ease-in-out;
+      opacity: 0.6;
+    }
+
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 204, 255, 0.15), transparent 70%);
+      animation: pulse 5s infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
+
+      nav {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+    <div class="math-bg" id="math-bg"></div>
+    <div class="animated-bg"></div>
+  
+  <header>
+    <h1 id="logo"><img src="Frame 545.png" alt="Logo" style="width: 20vw; height: 5vh;"></h1>
+    <nav>
+      <span id="welcome">Welcome</span>
+      <button id="profileBtn">👤</button>
+      <div class="profile-dropdown" id="profileDropdown">
+        <a href="profile.html">View Profile</a>
+        <button id="dropdownLogout">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="profile-container">
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-pic" id="profileInitial">H</div>
+          <h2 class="profile-name" id="profileName">Player Name</h2>
+          <p class="profile-city" id="profileCity">City</p>
+        </div>
+        
+      </div>
+
+      <div class="stats-card">
+        <h3 class="stats-header">Profile Statistics</h3>
+        <div class="stat-item">
+          <span class="stat-label">Rating:</span>
+          <span class="stat-value" id="ratingDisplay">700</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">History Count:</span>
+          <span class="stat-value" id="historyCount">0</span>
+        </div>
+        <div class="stat-item">
+  <span class="stat-label">Rating:</span>
+  <span class="stat-value" id="ratingDisplay">700</span>
+</div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <h3>About HectoClash</h3>
+    <p>HectoClash is a real-time competitive mental math game inspired by the Hectoc format. Challenge your friends or take on random opponents in a race to 100 using only six digits.</p>
+    <p><strong>Contact:</strong> hectoclash@hackfest.com</p>
+    <p>&copy; Hackfest. All rights reserved.</p>
+    <p><strong>Team:</strong> Harsh, Hirday, Tanish, Ayush</p>
+  </footer>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
+      authDomain: "techsprint-53b5c.firebaseapp.com",
+      projectId: "techsprint-53b5c",
+      storageBucket: "techsprint-53b5c.appspot.com",
+      messagingSenderId: "366810852442",
+      appId: "1:366810852442:web:d31260159a6c8b1c307c63",
+      measurementId: "G-PTPH19Z3QG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM elements
+    const profileBtn = document.getElementById("profileBtn");
+    const profileDropdown = document.getElementById("profileDropdown");
+    const dropdownLogout = document.getElementById("dropdownLogout");
+    const welcomeText = document.getElementById("welcome");
+    const logo = document.getElementById("logo");
+    const profileInitial = document.getElementById("profileInitial");
+    const profileName = document.getElementById("profileName");
+    const profileCity = document.getElementById("profileCity");
+    const ratingDisplay = document.getElementById("ratingDisplay");
+    const historyCountEl = document.getElementById("historyCount");
+    
+
+    // Toggle dropdown on profile button click
+    profileBtn.addEventListener("click", () => {
+      profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
+    });
+
+    // Logout action from dropdown
+    dropdownLogout.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.style.display = "none";
+      }
+    });
+
+    // Logo click handler
+    logo.addEventListener("click", () => {
+      window.location.href = "mainpage.html";
+    });
+
+    // Edit profile button handler
+    
+
+    // Load user data
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        welcomeText.innerText = `Welcome ${user.email}`;
+        
+        // Get user data from Firestore (using user.uid as document ID)
+        const userDoc = await getDoc(doc(db, "users", user.email));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          
+          // Update profile info
+          profileName.textContent = userData.name ;
+          profileCity.textContent = userData.city;
+          profileInitial.textContent = userData.name ? userData.name.charAt(0).toUpperCase() : "P";
+          
+          // Update stats: rating and history count
+          ratingDisplay.textContent = userData.rating || 700;
+          const historySize = userData.history && Array.isArray(userData.history)
+            ? userData.history.length
+            : 0;
+          historyCountEl.textContent = historySize;
+        }
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+      const container = document.getElementById('math-bg');
+
+      for (let i = 0; i < 100; i++) {
+        const symbol = document.createElement('div');
+        symbol.classList.add('math-symbol');
+        symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        symbol.style.left = Math.random() * 100 + 'vw';
+        symbol.style.top = Math.random() * 100 + 'vh';
+        symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+        symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+        container.appendChild(symbol);
+      }
+      
+  </script>
+</body>
+</html>

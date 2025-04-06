@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HectoClash</title>
+  <style>
+    :root {
+      --dark-bg: #0d0d0d;
+      --blue-primary: #1e90ff;
+      --blue-accent: #00aaff;
+      --neon-blue: #00ccff;
+      --light-text: #e0e0e0;
+      --btn-bg: #1e90ff;
+      --btn-hover: #00aaff;
+    }
+  
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--dark-bg);
+      color: var(--light-text);
+      overflow: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    header h1 {
+      font-size: 4rem;
+      color: var(--blue-primary);
+      text-shadow: 0 0 15px var(--neon-blue);
+    }
+
+    .math-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .math-symbol {
+      position: absolute;
+      font-size: 2rem;
+      color: var(--blue-accent);
+      animation: float 10s infinite ease-in-out;
+      opacity: 0.6;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: auto;
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .get-started {
+      padding: 1rem 2.5rem;
+      background-color: var(--btn-bg);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+      box-shadow: 0 0 15px var(--btn-bg);
+    }
+
+    .get-started:hover {
+      background-color: var(--btn-hover);
+      transform: scale(1.05);
+      box-shadow: 0 0 25px var(--btn-hover);
+    }
+
+    .advantages {
+      margin-top: 2rem;
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem 2.5rem;
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .advantages h2 {
+      color: var(--neon-blue);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .advantages ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .advantages li {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .advantages li::before {
+      content: "✔";
+      position: absolute;
+      left: 0;
+      color: var(--blue-primary);
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="math-bg" id="math-bg"></div>
+
+  <header style="margin-bottom: 0; padding-bottom: 0;">
+    <img src="Frame 545.png" alt="HectoClash Logo" style="width: 30vw; height: auto; margin-bottom: 1rem;" />
+  </header>
+
+  <div class="content" id="main-content">
+    <p style="font-size: 1.2rem; text-align: center; max-width: 600px;">Your adventure in the world of math begins here! Compete, learn, and grow with a community of math lovers.</p>
+    <button class="get-started" onclick="startAdventure()">Getting Started</button>
+
+    <div class="advantages">
+      <h2>Why Choose HectoClash?</h2>
+      <ul>
+        <li>Real-time duels to challenge friends or strangers.</li>
+        <li>Engaging math games to sharpen your skills.</li>
+        <li>Secure and smooth sign-in with robust authentication.</li>
+        <li>Global leaderboards and ranking system for motivation.</li>
+        <li>Detailed performance breakdown through interactive charts.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+    const container = document.getElementById('math-bg');
+
+    for (let i = 0; i < 100; i++) {
+      const symbol = document.createElement('div');
+      symbol.classList.add('math-symbol');
+      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      symbol.style.left = Math.random() * 100 + 'vw';
+      symbol.style.top = Math.random() * 100 + 'vh';
+      symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+      symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+      container.appendChild(symbol);
+    }
+
+    function startAdventure() {
+      window.location.href = 'mainpage.html'; // Redirect to signup page
+    }
+  </script>
+</body>
+
+</html>
