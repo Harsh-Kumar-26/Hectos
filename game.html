@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HectoClash Game</title>
   <style>
     :root {
@@ -162,20 +162,20 @@
   <div class="container">
     <div class="header">
       <div class="player" id="player1">
-        <img src="" id="p1pic" alt="Player 1">
+        <img src="" id="p1pic" alt="Player 1" />
         <span id="p1name">Player 1</span>
       </div>
       <div class="timer" id="timer">03:00</div>
       <div class="player" id="player2">
         <span id="p2name">Player 2</span>
-        <img src="" id="p2pic" alt="Player 2">
+        <img src="" id="p2pic" alt="Player 2" />
         <div class="score" id="opponentScore">Score: 0</div>
       </div>
     </div>
     <div class="score">Score: <span id="score">0</span></div>
     <div class="question" id="question"></div>
     <div class="input-area">
-      <input type="text" id="answerInput" placeholder="Build your equation" readonly>
+      <input type="text" id="answerInput" placeholder="Build your equation" readonly />
     </div>
     <div class="button-container" id="operatorButtons">
       <button class="operator-btn" data-operator="+">+</button>
@@ -192,10 +192,23 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script>
+  <script type="module">
+    // Import Firebase modules from the modular SDK
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
+    import {
+      getFirestore,
+      doc,
+      collection,
+      query,
+      where,
+      getDocs,
+      onSnapshot,
+      runTransaction,
+      getDoc,
+      updateDoc
+    } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
     const firebaseConfig = {
       apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
       authDomain: "techsprint-53b5c.firebaseapp.com",
@@ -206,9 +219,10 @@
       measurementId: "G-PTPH19Z3QG"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Initialize Firebase app, auth, and Firestore using modular API
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     let uid = null;
     let score = 0;
@@ -217,7 +231,6 @@
     let cor = 0, incor = 0, sk = 0;
     let timerInterval;
     let questionList = [];
-    let currentNumbers = [];
 
     const questionBox = document.getElementById("question");
     const scoreBox = document.getElementById("score");
@@ -252,27 +265,28 @@
       e.preventDefault();
     });
 
-    auth.onAuthStateChanged(async (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         uid = user.uid;
-        const userRef = db.collection("users").doc(user.email);
-        const userSnap = await userRef.get();
+        const userRef = doc(db, "users", user.email);
+        const userSnap = await getDoc(userRef);
         const data = userSnap.data();
 
         document.getElementById("p1name").textContent = data.name;
-        document.getElementById("p1pic").src = data.profile || "default.png";
+        // document.getElementById("p1pic").src = data.profile || "default.png";
 
-        const gameRef = db.collection("matchmaking").doc(gameId);
-        const gameSnap = await gameRef.get();
-        const gameData = gameSnap.data();
+        const gameRef = doc(db, "matchmaking", gameId);
+        const gameSnap = await getDoc(gameRef);
+        let gameData = gameSnap.data();
 
         if (!gameData.questions) {
           const questions = {};
           for (let i = 1; i <= 10; i++) {
             questions[`q${i}`] = await generateValidQuestion();
           }
-          await gameRef.update({ questions });
-          gameData.questions = questions;
+          // Update the game document with generated questions
+          await updateDoc(gameRef, { questions });
+          gameData = { ...gameData, questions };
         }
 
         let opponentUid;
@@ -281,18 +295,23 @@
         } else {
           opponentUid = gameData.player1;
         }
-        const q = db.collection("users").where("uid", "==", opponentUid);
-        const querySnapshot = await q.get();
+        const usersCollection = collection(db, "users");
+        const q = query(usersCollection, where("uid", "==", opponentUid));
+        const querySnapshot = await getDocs(q);
         let opponentData;
-        querySnapshot.forEach(doc => { opponentData = doc.data(); });
+        querySnapshot.forEach(docSnap => { opponentData = docSnap.data(); });
         if (opponentData) {
           document.getElementById("p2name").textContent = opponentData.name;
-          document.getElementById("p2pic").src = opponentData.profile || "default.png";
+          // document.getElementById("p2pic").src = opponentData.profile || "default.png";
         }
 
-        questionList = Object.values(gameData.questions).slice(0, 10).filter(q => q.length === 6);
-        
-        gameRef.onSnapshot(docSnapshot => {
+        // Ensure that the questions array only includes valid arrays (length 6)
+        questionList = Object.values(gameData.questions)
+          .slice(0, 10)
+          .filter(q => Array.isArray(q) && q.length === 6);
+
+        // Listen for game document changes using modular onSnapshot
+        onSnapshot(gameRef, (docSnapshot) => {
           const gameData = docSnapshot.data();
           const isPlayer1 = gameData.player1 === uid;
           const opponentData = isPlayer1 ? gameData.p2 : gameData.p1;
@@ -389,20 +408,38 @@
 
     async function endGame() {
       clearInterval(timerInterval);
-      const gameRef = db.collection("matchmaking").doc(gameId);
-      const gameSnap = await gameRef.get();
-      const gameData = gameSnap.data();
       
-      const isPlayer1 = gameData.player1 === uid;
-      await gameRef.update({
-        [isPlayer1 ? 'p1' : 'p2']: [score, cor, incor, sk]
-      });
+      const gameRef = doc(db, "matchmaking", gameId);
+      
+      try {
+        await runTransaction(db, async (transaction) => {
+          const gameDoc = await transaction.get(gameRef);
+          if (!gameDoc.exists()) {
+            throw "Document does not exist!";
+          }
+          const gameData = gameDoc.data();
+          const isPlayer1 = gameData.player1 === uid;
+          
+          // Merge updates: if current player's data is available, update it,
+          // otherwise, keep the existing data for the opponent.
+          const updatedP1 = isPlayer1 ? [score, cor, incor, sk] : (gameData.p1 || [0, 0, 0, 0]);
+          const updatedP2 = !isPlayer1 ? [score, cor, incor, sk] : (gameData.p2 || [0, 0, 0, 0]);
+          
+          transaction.update(gameRef, {
+            p1: updatedP1,
+            p2: updatedP2
+          });
+        });
+      } catch (e) {
+        console.error("Transaction failed: ", e);
+      }
 
-      const playerRef = db.collection("users").doc(auth.currentUser.email);
-      const playerSnap = await playerRef.get();
+      // Update user stats in their document
+      const playerRef = doc(db, "users", auth.currentUser.email);
+      const playerSnap = await getDoc(playerRef);
       const playerData = playerSnap.data();
       
-      await playerRef.update({
+      await updateDoc(playerRef, {
         num: (playerData.num || 0) + 1,
         game_id: gameId
       });
