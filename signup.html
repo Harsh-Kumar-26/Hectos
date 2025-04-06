@@ -5,7 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Signup | HectoClash</title>
   <style>
-    /* CSS Variables matching index.html */
+   img{
+    width: 20vw;
+    height: 10vh;
+   }
+   .math-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.math-symbol {
+  position: absolute;
+  color: var(--blue-accent);
+  font-weight: bold;
+  animation: float 10s infinite ease-in-out;
+  opacity: 0.6;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+  }
+}
     :root {
       --dark-bg: #0d0d0d;
       --blue-primary: #1e90ff;
@@ -174,10 +203,11 @@
   </style>
 </head>
 <body>
+    <div class="math-bg" id="math-bg"></div>
   <div class="animated-bg"></div>
   
   <div class="card">
-    <div class="logo">HectoClash</div>
+    <div class="logo"><img src="Frame 545.png"></div>
     <h2>Create Your Account</h2>
     <div class="input-group">
       <label for="name">Full Name</label>
@@ -204,7 +234,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
+  
     const firebaseConfig = {
       apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
       authDomain: "techsprint-53b5c.firebaseapp.com",
@@ -214,42 +244,57 @@
       appId: "1:366810852442:web:d31260159a6c8b1c307c63",
       measurementId: "G-PTPH19Z3QG"
     };
-
+  
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
+  
     window.signup = async function () {
       const name = document.getElementById("name").value.trim();
       const city = document.getElementById("city").value.trim();
-      const email = document.getElementById("email").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
       const password = document.getElementById("password").value;
-
+  
       if (!name || !city || !email || !password) {
         alert("Please fill all fields.");
         return;
       }
-
+  
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
-        // Save extra info to Firestore
-        await setDoc(doc(db, "users", user.uid), {
+  
+        // Save user info in 'users' collection using email as document ID
+        await setDoc(doc(db, "users", email), {
           name: name,
-          city: city,
           email: email,
-          createdAt: new Date(),
+          city: city,
           rating: 700,
-          num: 0
+          history: [], // Initialize with empty array
+          createdAt: new Date()
         });
-
-        alert("Signup successful! Redirecting...");
-        window.location.href = "mainpage.html";  // Changed to index.html to match your main page
+  
+       
+        window.location.href = "mainpage.html";
       } catch (error) {
         alert("Signup failed: " + error.message);
       }
     };
+    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+    const container = document.getElementById('math-bg');
+
+    for (let i = 0; i < 100; i++) {
+      const symbol = document.createElement('div');
+      symbol.classList.add('math-symbol');
+      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      symbol.style.left = Math.random() * 100 + 'vw';
+      symbol.style.top = Math.random() * 100 + 'vh';
+      symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+      symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+      container.appendChild(symbol);
+    }
+
   </script>
+  
 </body>
 </html>
