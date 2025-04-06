@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HectoClash - Practice</title>
   <style>
-    /* CSS Variables for easy customization - Matching index.html */
     :root {
       --dark-bg: #0d0d0d;
       --blue-primary: #1e90ff;
@@ -18,26 +17,49 @@
       --border: #444;
       --glass-bg: rgba(255, 255, 255, 0.06);
     }
-    
-    /* Global resets and base styling - Matching index.html */
+    .math-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .math-symbol {
+      position: absolute;
+      font-size: 2rem;
+      color: var(--blue-accent);
+      animation: float 10s infinite ease-in-out;
+      opacity: 0.6;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    
+
     body {
       background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
       color: var(--light-text);
       min-height: 100vh;
+      padding: 0 1rem 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem;
     }
-    
-    /* Animated background overlay - Matching index.html */
+
     .animated-bg {
       position: fixed;
       top: 0;
@@ -48,17 +70,16 @@
       animation: pulse 5s infinite;
       z-index: -1;
     }
+
     @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.2);
-      }
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
     }
-    
-    /* Header styling - Matching index.html */
-    header {
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
       width: 100%;
       max-width: 900px;
       background: linear-gradient(90deg, var(--blue-primary), var(--blue-accent));
@@ -66,33 +87,32 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-      margin-bottom: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      margin: 1rem 0 2rem;
     }
-    
-    header h1 {
-      font-size: 1.8rem;
-      cursor: pointer;
+
+    .navbar img.logo {
+      height: 40px;
     }
-    
-    header button {
-      background: rgba(0,0,0,0.2);
-      border: 2px solid var(--light-text);
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
       color: var(--light-text);
-      padding: 8px 16px;
-      border-radius: 6px;
       font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      transition: color 0.3s ease;
     }
-    
-    header button:hover {
-      background: rgba(0,0,0,0.4);
-      transform: scale(1.05);
+
+    .nav-links a:hover {
+      color: #fff;
+      text-shadow: 0 0 5px var(--neon-blue);
     }
-    
-    /* Card styling - Matching index.html */
+
     .card {
       width: 100%;
       max-width: 900px;
@@ -104,19 +124,18 @@
       border: 2px solid transparent;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    
+
     .card:hover {
       transform: translateY(-5px);
       box-shadow: 0 8px 20px rgba(0,0,0,0.7);
       border-color: var(--neon-blue);
     }
-    
-    /* Number display styling */
+
     .number-display {
       text-align: center;
       margin-bottom: 2rem;
     }
-    
+
     .number-display span {
       display: inline-block;
       background: rgba(0,0,0,0.4);
@@ -129,13 +148,12 @@
       min-width: 50px;
       color: var(--neon-blue);
     }
-    
-    /* Input section styling */
+
     .input-section {
       text-align: center;
       margin-bottom: 2rem;
     }
-    
+
     .input-section input {
       width: 90%;
       max-width: 600px;
@@ -148,12 +166,12 @@
       text-align: center;
       transition: box-shadow 0.3s ease;
     }
-    
+
     .input-section input:focus {
       outline: none;
       box-shadow: 0 0 12px var(--neon-blue);
     }
-    
+
     .input-section p {
       margin: 1rem auto 0;
       font-size: 0.95rem;
@@ -161,16 +179,17 @@
       max-width: 600px;
       opacity: 0.8;
     }
-    
-    /* Button group styling */
+
     .btn-group {
       display: flex;
       justify-content: center;
       gap: 2rem;
       margin-bottom: 2rem;
     }
-    
-    .btn-group button {
+
+    .btn-group button,
+    #restartBtn,
+    #endBtn {
       padding: 12px 24px;
       font-size: 1.1rem;
       border: none;
@@ -181,107 +200,83 @@
       transition: all 0.3s ease;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
-    
-    .btn-group button:hover {
+
+    .btn-group button:hover,
+    #restartBtn:hover,
+    #endBtn:hover {
       background: var(--btn-hover);
       transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
     }
-    
-    /* Timer display */
+
     #timerDisplay {
       font-size: 1.2rem;
       text-align: center;
       margin-bottom: 1.5rem;
       color: var(--neon-blue);
     }
-    
-    /* Analysis section */
+
     .analysis {
       text-align: center;
     }
-    
+
     .analysis h2 {
       margin-bottom: 1.5rem;
       font-size: 1.8rem;
       color: var(--blue-primary);
     }
-    
+
     .analysis p, .analysis ul {
       font-size: 1.1rem;
       margin: 1rem 0;
     }
-    
-    .analysis ul {
-      list-style: none;
-      padding: 0;
-    }
-    
+
     .analysis li {
       margin: 0.5rem 0;
       padding: 0.5rem;
       background: rgba(0,0,0,0.2);
       border-radius: 6px;
     }
-    
+
     .hidden {
       display: none;
     }
-    
-    #restartBtn {
-      margin-top: 1.5rem;
-      padding: 12px 24px;
-      font-size: 1rem;
-      background: var(--btn-bg);
-      border: none;
-      border-radius: 8px;
-      color: var(--light-text);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    #restartBtn:hover {
-      background: var(--btn-hover);
-      transform: translateY(-2px);
-    }
-    
-    /* Responsive design */
+
     @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-      
-      header {
+      .navbar {
         flex-direction: column;
-        text-align: center;
         gap: 1rem;
       }
-      
+
+      .nav-links {
+        flex-direction: column;
+        align-items: center;
+      }
+
       .number-display span {
         font-size: 1.5rem;
-        padding: 8px 12px;
         margin: 0 5px;
       }
-      
+
       .btn-group {
         flex-direction: column;
         gap: 1rem;
-      }
-      
-      .input-section input {
-        font-size: 1.2rem;
-        padding: 12px 16px;
       }
     }
   </style>
 </head>
 <body>
   <div class="animated-bg"></div>
+  <div class="math-bg" id="math-bg"></div>
   
-  <header>
-    <h1>Practice Arena</h1>
-    <button id="endBtn">End Practice</button>
-  </header>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <img src="Frame 545.png" alt="HectoClash Logo" class="logo" />
+    <div class="nav-links">
+      <a href="mainpage.html">Home</a>
+      <a href="history.html">History</a>
+      <a href="practice.html">Practice</a>
+    </div>
+  </nav>
 
   <div class="card" id="mainCard">
     <div class="number-display" id="numberDisplay"></div>
@@ -294,6 +289,7 @@
     <div class="btn-group">
       <button id="submitBtn">Submit</button>
       <button id="clearBtn">Clear</button>
+      <button id="endBtn">End Practice</button>
     </div>
 
     <div id="timerDisplay"></div>
@@ -437,6 +433,20 @@
     });
 
     newQuestion();
+
+    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+      const container = document.getElementById('math-bg');
+
+      for (let i = 0; i < 100; i++) {
+        const symbol = document.createElement('div');
+        symbol.classList.add('math-symbol');
+        symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        symbol.style.left = Math.random() * 100 + 'vw';
+        symbol.style.top = Math.random() * 100 + 'vh';
+        symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+        symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+        container.appendChild(symbol);
+      }
   </script>
 </body>
 </html>
