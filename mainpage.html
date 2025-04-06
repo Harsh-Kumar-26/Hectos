@@ -17,7 +17,32 @@
       --btn-hover: #00aaff;
     }
     
-    /* Global resets and base styling */
+    .math-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .math-symbol {
+      position: absolute;
+      font-size: 2rem;
+      color: var(--blue-accent);
+      animation: float 10s infinite ease-in-out;
+      opacity: 0.6;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
     * {
       margin: 0;
       padding: 0;
@@ -230,8 +255,9 @@
 </head>
 <body>
   <div class="animated-bg"></div>
+  <div class="math-bg" id="math-bg"></div>
   <header>
-    <h1 id="logo">HectoClash</h1>
+    <img src="Frame 545.png" style="width: 20vw; height: 7vh;">
     <nav>
       <!-- Welcome text gets updated with user's name -->
       <span id="welcome">Welcome</span>
@@ -256,9 +282,17 @@
         <h3>Leaderboard</h3>
         <p>See the top players and challenge your rank.</p>
       </div>
-      <div id="help" class="card">
-        <h3>Help & Info</h3>
-        <p>Learn more about HectoClash and how to play.</p>
+      <div id="practice" class="card">
+        <h3>Practice</h3>
+        <p>Hone your skills in a practice mode with no pressure.</p>
+      </div>
+      <div id="settings" class="card">
+        <h3>Have queries?</h3>
+        <p>Check out FAQ</p>
+      </div>
+      <div id="history" class="card">
+        <h3>History</h3>
+        <p>Check your past contests.</p>
       </div>
     </div>
   </main>
@@ -270,11 +304,12 @@
     <p>HectoClash is a real-time competitive mental math game inspired by the Hectoc format. Challenge your friends or take on random opponents in a race to 100 using only six digits.</p>
     <p><strong>Contact:</strong> hectoclash@hackfest.com</p>
     <p>&copy; Hackfest. All rights reserved.</p>
-    <p><strong>Team:</strong> Harsh, Hirday, Tanish, Ayush</p>
+    <p><strong>Team:</strong> Harsh, Tanish, Ayush, Hirday</p>
   </footer>
 
   <!-- Firebase SDK and functionality -->
   <script type="module">
+    
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
@@ -300,6 +335,8 @@
     const onevoneBtn = document.getElementById("onevone");
     const leaderboardBtn = document.getElementById("leaderboard");
     const helpBtn = document.getElementById("help");
+    const practiceBtn = document.getElementById("practice");
+    const settingsBtn = document.getElementById("settings");
     const loader = document.getElementById("loader");
     const logo = document.getElementById("logo");
 
@@ -331,9 +368,7 @@
       }
     });
 
-    logo.addEventListener("click", () => {
-      window.location.reload();
-    });
+    
 
     const generateGameID = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -367,7 +402,7 @@
         };
         const questions = generateRandomArray();
         await setDoc(doc(db, "matchmaking", gameId), {
-          player1: user.uid,
+          player1: auth.currentUser.uid,
           status: "waiting",
           createdAt: serverTimestamp(),
           questions
@@ -386,9 +421,33 @@
       window.location.href = "leaderboard.html";
     });
 
-    helpBtn.addEventListener("click", () => {
+    
+
+    practiceBtn.addEventListener("click", () => {
+      window.location.href = "practice.html";
+    });
+
+    settingsBtn.addEventListener("click", () => {
       window.location.href = "help.html";
     });
+
+    const historyBtn = document.getElementById("history");
+    historyBtn.addEventListener("click", () => {
+      window.location.href = "history.html";
+    });
+    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+    const container = document.getElementById('math-bg');
+
+    for (let i = 0; i < 100; i++) {
+      const symbol = document.createElement('div');
+      symbol.classList.add('math-symbol');
+      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      symbol.style.left = Math.random() * 100 + 'vw';
+      symbol.style.top = Math.random() * 100 + 'vh';
+      symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+      symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+      container.appendChild(symbol);
+    }
   </script>
 </body>
 </html>
