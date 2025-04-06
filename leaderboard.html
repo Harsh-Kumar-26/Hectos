@@ -4,26 +4,93 @@
   <meta charset="UTF-8" />
   <title>HectoClash Leaderboard</title>
   <style>
+    :root {
+      --dark-bg: #0d0d0d;
+      --blue-primary: #1e90ff;
+      --blue-accent: #00aaff;
+      --neon-blue: #00ccff;
+      --light-text: #e0e0e0;
+      --card-bg: rgba(20, 20, 20, 0.95);
+      --btn-bg: #1e90ff;
+      --btn-hover: #00aaff;
+      --input-bg: rgba(30, 30, 30, 0.8);
+      --border: #333;
+    }
+    .math-symbol {
+      position: absolute;
+      font-size: 2rem;
+      color: var(--blue-accent);
+      animation: float 10s infinite ease-in-out;
+      opacity: 0.6;
+    }
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
+
+
+    .math-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: -1;
+    }
     /* Base Styles */
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #0a0f1c;
-      color: #d0e6ff;
-      padding: 2rem;
+      background-color: var(--dark-bg);
+      color: var(--light-text);
+      padding-top: 4rem; /* space for navbar */
     }
 
     h1 {
       text-align: center;
-      color: #4ea1f3;
-      margin-bottom: 2rem;
+      color: var(--blue-primary);
+      margin: 2rem 0;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5rem;
+      background-color: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      border-bottom: 1px solid var(--border);
+      z-index: 999;
+    }
+
+    .navbar a {
+      color: var(--light-text);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .navbar a:hover {
+      background-color: var(--blue-accent);
+      color: #000;
     }
 
     /* Table Styles */
     table {
       width: 100%;
       border-collapse: collapse;
-      background-color: #101a2e;
+      background-color: var(--card-bg);
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
@@ -32,28 +99,37 @@
     th, td {
       padding: 1rem;
       text-align: center;
-      border-bottom: 1px solid #1e2b45;
+      border-bottom: 1px solid var(--border);
     }
 
     th {
-      background-color: #15233d;
-      color: #84caff;
+      background-color: var(--input-bg);
+      color: var(--neon-blue);
     }
 
     tr:hover {
-      background-color: #16243c;
+      background-color: var(--input-bg);
     }
 
     /* Trophy Icon Styles */
     .rank-icon {
       font-size: 1.4rem;
     }
+
     .gold { color: gold; }
     .silver { color: silver; }
     .bronze { color: #cd7f32; }
   </style>
 </head>
 <body>
+    <div class="math-bg" id="math-bg"></div>
+  <nav class="navbar">
+    <a href="profile.html">Profile</a>
+    <a href="help.html">Help</a>
+    <a href="history.html">History</a>
+    <a href="practice.html">Practice</a>
+  </nav>
+
   <h1>🏆 HectoClash Leaderboard</h1>
   <table id="leaderboard">
     <thead>
@@ -70,11 +146,9 @@
   </table>
 
   <script type="module">
-    // Import Firebase modules from v11.6.0 CDN
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-    // Your Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBF5w8l2TiH1OTFho-N4qBlVzgC5fw8dG4",
       authDomain: "techsprint-53b5c.firebaseapp.com",
@@ -85,46 +159,35 @@
       measurementId: "G-PTPH19Z3QG"
     };
 
-    // Initialize Firebase app and Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     const leaderboardBody = document.getElementById("leaderboard-body");
 
-    /**
-     * Loads the leaderboard data from Firestore and renders the table.
-     */
     async function loadLeaderboard() {
       try {
-        // Get all user documents from the "users" collection
         const querySnapshot = await getDocs(collection(db, "users"));
         const users = [];
 
-        // Loop through each document and build an array of user data
         querySnapshot.forEach(doc => {
           const data = doc.data();
           users.push({
-            email: doc.id, // Using document ID as the user identifier (email)
+            email: doc.id,
             rating: data.rating || 0,
             highestRating: data.highestRating || 0
           });
         });
 
-        // Sort users by rating in descending order
         users.sort((a, b) => b.rating - a.rating);
 
-        // Render each user in the leaderboard table
         users.forEach((user, index) => {
           const rank = index + 1;
           let rankDisplay;
 
-          // Assign trophy icons for the top three
           if (rank === 1) rankDisplay = `<span class="rank-icon gold">🏆</span>`;
           else if (rank === 2) rankDisplay = `<span class="rank-icon silver">🥈</span>`;
           else if (rank === 3) rankDisplay = `<span class="rank-icon bronze">🥉</span>`;
           else rankDisplay = rank;
 
-          // Create a table row with user data
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${rankDisplay}</td>
@@ -139,8 +202,20 @@
       }
     }
 
-    // Call the function to load and display leaderboard data
     loadLeaderboard();
+    const symbols = ['+', '-', '\u00D7', '\u00F7', '=', '\u221A', '\u03C0', '\u222B'];
+    const container = document.getElementById('math-bg');
+
+    for (let i = 0; i < 100; i++) {
+      const symbol = document.createElement('div');
+      symbol.classList.add('math-symbol');
+      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      symbol.style.left = Math.random() * 100 + 'vw';
+      symbol.style.top = Math.random() * 100 + 'vh';
+      symbol.style.fontSize = Math.random() * 3 + 1 + 'rem';
+      symbol.style.animationDuration = (5 + Math.random() * 10) + 's';
+      container.appendChild(symbol);
+    }
   </script>
 </body>
 </html>
