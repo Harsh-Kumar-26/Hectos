@@ -132,9 +132,168 @@
         padding: 0.6rem 1.2rem;
       }
     }
+  /* Consistent Navbar Styles */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 204, 255, 0.2);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+}
+
+.nav-logo {
+  height: 40px;
+  transition: transform 0.3s ease;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-link {
+  color: #e0e0e0;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  background: rgba(0, 204, 255, 0.1);
+  color: #00ccff;
+}
+
+.nav-link.active {
+  color: #00ccff;
+  font-weight: bold;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: #00ccff;
+  border-radius: 50%;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid #333;
+  border-radius: 8px;
+  min-width: 180px;
+  padding: 0.5rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.dropdown-content a {
+  color: #e0e0e0;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  display: block;
+  transition: background 0.3s ease;
+}
+
+.dropdown-content a:hover {
+  background: rgba(0, 204, 255, 0.1);
+}
+
+.show-dropdown {
+  display: block !important;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+  }
+  
+  .nav-links {
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+  }
+  
+  .nav-links {
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+}
   </style>
 </head>
 <body>
+    <nav class="navbar">
+        <a href="mainpage.html" class="nav-logo">
+          <img src="Frame 545.png" alt="HectoClash" class="nav-logo">
+        </a>
+        
+        <div class="nav-links">
+          <a href="mainpage.html" class="nav-link">Home</a>
+          <a href="practice.html" class="nav-link">Practice</a>
+          <a href="history.html" class="nav-link">History</a>
+          <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+          
+          <div class="profile-section">
+            <div class="profile-dropdown">
+              <button class="nav-link" id="profileToggle">
+                👤 <span id="navEmail"></span>
+              </button>
+              <div class="dropdown-content" id="profileDropdown">
+                <a href="profile.html">Profile</a>
+                <a href="help.html">Help</a>
+                <a href="#" id="logoutBtn">Logout</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
     <div class="animated-bg"></div>
     <div class="math-bg" id="math-bg"></div>
   <div class="container">
@@ -181,7 +340,7 @@
         Who can I contact for help? <span>➕</span>
       </div>
       <div class="faq-answer">
-        You can reach out to our support team via the official website or check out the tutorials section for walk-throughs and video guides.
+        You can reach out to our support team via the official website 
       </div>
     </div>
 
@@ -189,8 +348,64 @@
       <a href="mainpage.html" class="btn">⬅ Back to Main Page</a>
     </div>
   </div>
-
+  <script type="module">
+    // Auth and logout functionality
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    
+    const auth = getAuth();
+    
+    // Toggle dropdown
+    document.getElementById('profileToggle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('profileDropdown').classList.toggle('show-dropdown');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.profile-dropdown')) {
+        document.getElementById('profileDropdown').classList.remove('show-dropdown');
+      }
+    });
+    
+    // Logout handler
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      signOut(auth).then(() => {
+        window.location.href = 'index.html';
+      }).catch((error) => {
+        console.error('Logout error:', error);
+      });
+    });
+    
+    // Update user email
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('navEmail').textContent = user.email;
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+    </script>
   <script>
+    // Toggle profile dropdown
+function toggleDropdown() {
+  const dropdown = document.getElementById('profileDropdown');
+  dropdown.classList.toggle('show-dropdown');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const dropdown = document.getElementById('profileDropdown');
+  if (!e.target.closest('.profile-dropdown')) {
+    dropdown.classList.remove('show-dropdown');
+  }
+});
+
+// Logout functionality
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  // Add your Firebase logout logic here
+  window.location.href = 'login.html';
+});
     const faqItems = document.querySelectorAll('.faq-item');
 
     faqItems.forEach(item => {
